@@ -13,14 +13,12 @@
     <groupId>org.am</groupId>
     <artifactId>academic-management</artifactId>
     <packaging>pom</packaging>
-
     <modules>
-        <module>am-domain-module</module>
-        <module>am-dto-module</module>
-        <module>am-repository-module</module>
-        <module>am-service-module</module>
-        <module>am-web-module</module>
+        <module>am-core-web-service</module>
+        <module>am-util</module>
     </modules>
+
+
     <version>${revision}</version>
 
     <properties>
