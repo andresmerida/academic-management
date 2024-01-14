@@ -62,11 +62,12 @@ public class CareerController {
     public ResponseEntity<Void> delete(@PathVariable final Integer careerid) {
         try {
             careerService.delete(careerid);
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.noContent().build();
+
         } catch (DataIntegrityViolationException e) {
             CareerDto career = careerService.getCareerById(careerid).get();
             careerService.editActive(career);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 }
