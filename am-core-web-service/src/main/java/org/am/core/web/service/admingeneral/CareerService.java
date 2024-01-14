@@ -1,9 +1,7 @@
 package org.am.core.web.service.admingeneral;
 
-import org.am.core.web.domain.entity.admingeneral.Area;
+
 import org.am.core.web.domain.entity.admingeneral.Career;
-import org.am.core.web.dto.admingeneral.AreaDto;
-import org.am.core.web.dto.admingeneral.AreaRequest;
 import org.am.core.web.dto.admingeneral.CareerDto;
 import org.am.core.web.dto.admingeneral.CareerRequest;
 import org.am.core.web.repository.jpa.CustomMap;
@@ -46,16 +44,20 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         careerFromDB.setName(careerDto.name());
         careerFromDB.setInitials(careerDto.initials());
         careerFromDB.setDescription(careerDto.description());
-        careerFromDB.setActive(careerDto.active());
-        careerFromDB.setAreaID(careerDto.areaID());
+        careerFromDB.setArea(careerDto.area());
         return toDto(careerRepository.save(careerFromDB));
     }
 
     public CareerDto editActive(CareerDto careerDto) {
         Career careerFromDB = careerRepository.findById(careerDto.id())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
-        careerFromDB.setActive(careerDto.active());
+        careerFromDB.setActive(false);
         return toDto(careerRepository.save(careerFromDB));
+    }
+
+
+    public void delete(Integer id) {
+        careerRepository.deleteById(id);
     }
 
 
@@ -68,7 +70,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
                 career.getDescription(),
                 career.getCreationDate(),
                 career.getActive(),
-                career.getAreaID()
+                career.getArea()
         );
     }
 
@@ -80,7 +82,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         career.setInitials(careerDto.initials());
         career.setDescription(careerDto.description());
         career.setActive(careerDto.active());
-        career.setAreaID(careerDto.areaID());
+        career.setArea(careerDto.area());
         return career;
     }
 
@@ -91,7 +93,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
                 careerRequest.description(),
                 LocalDateTime.now(),
                 Boolean.TRUE,
-                careerRequest.areaID()
+                careerRequest.area()
         );
     }
 }

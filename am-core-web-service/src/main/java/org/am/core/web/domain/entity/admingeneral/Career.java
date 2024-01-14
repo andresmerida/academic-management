@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,14 +25,14 @@ public class Career {
     private LocalDateTime creationDate;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "area_id")
-    private Area areaID;
+    private Area area;
 
-    public Career(String name, String initials, String description, LocalDateTime creationDate, Boolean active, Area areaID) {
+    public Career(String name, String initials, String description, LocalDateTime creationDate, Boolean active, Area area) {
         this.name = name;
         this.initials = initials;
         this.description = description;
         this.creationDate = creationDate;
         this.active = active;
-        this.areaID = areaID;
+        this.area = area;
     }
 }
