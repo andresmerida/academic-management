@@ -1,5 +1,6 @@
 package org.am.core.web.repository.jpa.admingeneral;
 
+import org.am.core.web.domain.entity.admingeneral.Area;
 import org.am.core.web.domain.entity.admingeneral.Career;
 import org.springframework.data.repository.CrudRepository;
 
@@ -7,5 +8,6 @@ import java.util.List;
 
 public interface CareerRepository extends CrudRepository<Career, Integer> {
 
+    List<Career> findAllByArea_IdOrderById(Integer areaID);
     List<Career> findAllByActiveOrderByName(Boolean active);
 }

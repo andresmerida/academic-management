@@ -22,15 +22,32 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         this.careerRepository = careerRepository;
     }
 
-    public List<CareerDto> findAllActive() {
-        return careerRepository.findAllByActiveOrderByName(Boolean.TRUE)
-                .stream()
-                .map(this::toDto).collect(Collectors.toList());
+    public List<CareerDto> getActiveCareersByAreaId(Integer areaID) {
+        List<Career> careers = careerRepository.findAllByArea_IdOrderById(areaID);
+
+        List<Career> activeCareers = careers.stream()
+                .filter(c -> c.getActive().equals(Boolean.TRUE))
+                .collect(Collectors.toList());
+
+        return activeCareers.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
+    public Optional<CareerDto> getCareerByIdByArea(Integer id) {
 
-    public Optional<CareerDto> getCareerById(Integer id) {
-        return careerRepository.findById(id).map(this::toDto);
+        Career career = careerRepository.findById(id).orElseThrow();
+        Integer areaId = career.getArea().getId();
+
+        List<CareerDto> careers = getActiveCareersByAreaId(areaId);
+
+        CareerDto foundCareer = careers.stream()
+                .filter(c -> c.id().equals(id))
+                .findFirst()
+                .orElseThrow();
+
+        return Optional.of(foundCareer);
+
     }
 
 

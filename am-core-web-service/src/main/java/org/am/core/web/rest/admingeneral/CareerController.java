@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/admin/careers")
+@RequestMapping("/admin/areas/{areaID}/careers")
 public class CareerController {
 
     private final CareerService careerService;
@@ -25,14 +25,15 @@ public class CareerController {
         this.careerService = careerService;
     }
 
+
     @GetMapping
-    public ResponseEntity<List<CareerDto>> listCareer() {
-        return ResponseEntity.ok().body(careerService.findAllActive());
+    public ResponseEntity<List<CareerDto>> listCareerByArea(@PathVariable final Integer areaID) {
+        return ResponseEntity.ok().body(careerService.getActiveCareersByAreaId(areaID));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CareerDto> getCareerById(@PathVariable final Integer id) {
-        return ResponseEntity.ok(careerService.getCareerById(id).orElseThrow(() -> new IllegalArgumentException("Career with " + id + "not exist")));
+    public ResponseEntity<CareerDto> getCareerByIdByArea(@PathVariable final Integer id) {
+        return ResponseEntity.ok(careerService.getCareerByIdByArea(id).orElseThrow(() -> new IllegalArgumentException("Career with " + id + "not exist")));
     }
 
     @PostMapping
@@ -63,9 +64,8 @@ public class CareerController {
         try {
             careerService.delete(careerid);
             return ResponseEntity.noContent().build();
-
         } catch (DataIntegrityViolationException e) {
-            CareerDto career = careerService.getCareerById(careerid).get();
+            CareerDto career = careerService.getCareerByIdByArea(careerid).get();
             careerService.editActive(career);
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
