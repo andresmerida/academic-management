@@ -21,18 +21,20 @@ public class Career {
     private String initials;
     private String description;
     private Boolean active;
+    private String code;
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "area_id")
     private Area area;
 
-    public Career(String name, String initials, String description, LocalDateTime creationDate, Boolean active, Area area) {
+    public Career(String name, String initials, String description, Boolean active, String code, LocalDateTime creationDate, Area area) {
         this.name = name;
         this.initials = initials;
         this.description = description;
-        this.creationDate = creationDate;
         this.active = active;
+        this.code = code;
+        this.creationDate = creationDate;
         this.area = area;
     }
 }

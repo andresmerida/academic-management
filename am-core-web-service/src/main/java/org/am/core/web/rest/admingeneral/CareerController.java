@@ -65,7 +65,7 @@ public class CareerController {
             careerService.delete(careerid);
             return ResponseEntity.noContent().build();
         } catch (DataIntegrityViolationException e) {
-            CareerDto career = careerService.getCareerByIdByArea(careerid).get();
+            CareerDto career = careerService.getCareerById(careerid).get();
             careerService.editActive(career);
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
