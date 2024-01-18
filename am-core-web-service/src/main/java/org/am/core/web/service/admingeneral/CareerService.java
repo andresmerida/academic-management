@@ -51,6 +51,8 @@ public class CareerService implements CustomMap<CareerDto, Career> {
     }
 
 
+
+
     public CareerDto save(CareerRequest careerRequest) {
         return toDto(careerRepository.save(this.toEntity(careerRequest)));
     }
@@ -61,6 +63,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         careerFromDB.setName(careerDto.name());
         careerFromDB.setInitials(careerDto.initials());
         careerFromDB.setDescription(careerDto.description());
+        careerFromDB.setCode(careerDto.code());
         careerFromDB.setArea(careerDto.area());
         return toDto(careerRepository.save(careerFromDB));
     }
@@ -77,6 +80,9 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         careerRepository.deleteById(id);
     }
 
+    public Optional<CareerDto> getCareerById(Integer id) {
+        return careerRepository.findById(id).map(this::toDto);
+    }
 
     @Override
     public CareerDto toDto(Career career) {
@@ -87,6 +93,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
                 career.getDescription(),
                 career.getCreationDate(),
                 career.getActive(),
+                career.getCode(),
                 career.getArea()
         );
     }
@@ -108,8 +115,9 @@ public class CareerService implements CustomMap<CareerDto, Career> {
                 careerRequest.name(),
                 careerRequest.initials(),
                 careerRequest.description(),
-                LocalDateTime.now(),
                 Boolean.TRUE,
+                careerRequest.code(),
+                LocalDateTime.now(),
                 careerRequest.area()
         );
     }

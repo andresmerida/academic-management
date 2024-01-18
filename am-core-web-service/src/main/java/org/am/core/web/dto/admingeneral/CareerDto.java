@@ -6,5 +6,5 @@ import java.time.LocalDateTime;
 
 
 public record CareerDto (Integer id, String name, String initials,
-                         String description, LocalDateTime creationDate,Boolean active, Area area){
+                         String description, LocalDateTime creationDate,Boolean active, String code, Area area){
 }
