@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/admin/areas/{areaID}/academicPeriod")
+@RequestMapping("/admin/areas/{areaID}/academic-periods")
 public class AcademicPeriodController {
     private final AcademicPeriodService academicPeriodService;
 
@@ -24,7 +24,7 @@ public class AcademicPeriodController {
 
     @GetMapping
     public ResponseEntity<List<AcademicPeriodDto>> listAcademicPeriodByArea(@PathVariable final Integer areaID) {
-        return ResponseEntity.ok().body(academicPeriodService.getActiveAcademicPeriodByAreaId(areaID));
+        return ResponseEntity.ok().body(academicPeriodService.getActiveAcademicPeriodsByAreaId(areaID));
     }
 
     @GetMapping("/{id}")

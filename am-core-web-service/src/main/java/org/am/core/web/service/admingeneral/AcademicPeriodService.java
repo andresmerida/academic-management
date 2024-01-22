@@ -21,7 +21,7 @@ public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, Acade
     }
 
     @SuppressWarnings("UnresolvedClassReferenceRepair")
-    public List<AcademicPeriodDto> getActiveAcademicPeriodByAreaId(Integer areaID) {
+    public List<AcademicPeriodDto> getActiveAcademicPeriodsByAreaId(Integer areaID) {
         List<AcademicPeriod> listaAcademicPeriods = academicPeriodRepository.findAllByArea_IdOrderById(areaID);
 
         List<AcademicPeriod> academicPeriods = listaAcademicPeriods.stream()
