@@ -8,6 +8,7 @@ import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.admingeneral.CareerRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -63,6 +64,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         careerFromDB.setName(careerDto.name());
         careerFromDB.setInitials(careerDto.initials());
         careerFromDB.setDescription(careerDto.description());
+        careerFromDB.setCreationDate(careerDto.creationDate());
         careerFromDB.setCode(careerDto.code());
         careerFromDB.setArea(careerDto.area());
         return toDto(careerRepository.save(careerFromDB));
@@ -105,6 +107,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         career.setName(careerDto.name());
         career.setInitials(careerDto.initials());
         career.setDescription(careerDto.description());
+        career.setCreationDate(careerDto.creationDate());
         career.setActive(careerDto.active());
         career.setArea(careerDto.area());
         return career;
@@ -117,7 +120,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
                 careerRequest.description(),
                 Boolean.TRUE,
                 careerRequest.code(),
-                LocalDateTime.now(),
+                LocalDate.now(),
                 careerRequest.area()
         );
     }
