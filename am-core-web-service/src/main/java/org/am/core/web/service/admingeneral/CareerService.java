@@ -64,10 +64,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         careerFromDB.setName(careerDto.name());
         careerFromDB.setInitials(careerDto.initials());
         careerFromDB.setDescription(careerDto.description());
-<<<<<<< HEAD
         careerFromDB.setCreationDate(careerDto.creationDate());
-=======
->>>>>>> dev
         careerFromDB.setCode(careerDto.code());
         careerFromDB.setArea(careerDto.area());
         return toDto(careerRepository.save(careerFromDB));
@@ -123,11 +120,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
                 careerRequest.description(),
                 Boolean.TRUE,
                 careerRequest.code(),
-<<<<<<< HEAD
                 LocalDate.now(),
-=======
-                LocalDateTime.now(),
->>>>>>> dev
                 careerRequest.area()
         );
     }
