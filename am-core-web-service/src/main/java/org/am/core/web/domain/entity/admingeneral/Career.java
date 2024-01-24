@@ -28,7 +28,11 @@ public class Career {
     @JoinColumn(name = "area_id")
     private Area area;
 
+<<<<<<< HEAD
     public Career(String name, String initials, String description, Boolean active, String code, LocalDate creationDate, Area area) {
+=======
+    public Career(String name, String initials, String description, Boolean active, String code, LocalDateTime creationDate, Area area) {
+>>>>>>> dev
         this.name = name;
         this.initials = initials;
         this.description = description;

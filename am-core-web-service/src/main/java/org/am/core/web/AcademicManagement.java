@@ -1,6 +1,5 @@
 package org.am.core.web;
 
-import org.am.core.web.config.WebConfing;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import java.net.UnknownHostException;
 import java.util.Optional;
 
 @SpringBootApplication
-@Import(WebConfing.class)
 public class AcademicManagement {
 
     private static final Logger log = LoggerFactory.getLogger(AcademicManagement.class);
