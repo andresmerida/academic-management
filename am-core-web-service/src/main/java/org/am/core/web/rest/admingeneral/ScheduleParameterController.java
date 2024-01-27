@@ -18,6 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class ScheduleParameterController {
 
     private final ScheduleParametersService scheduleParametersService;
+
+    /*public ScheduleParameterController(ScheduleParametersService scheduleParametersService) {
+        this.scheduleParametersService = scheduleParametersService;
+    }*/
+
     @GetMapping("/{areaId}")
     public ResponseEntity<ScheduleParametersDto> getScheduleParametersById(@PathVariable final Integer areaId) {
         return ResponseEntity

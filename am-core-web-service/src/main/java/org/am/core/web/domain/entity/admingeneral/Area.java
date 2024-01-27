@@ -25,4 +25,20 @@ public class Area {
         this.initials = initials;
         this.active = active;
     }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getInitials() {
+        return initials;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
 }

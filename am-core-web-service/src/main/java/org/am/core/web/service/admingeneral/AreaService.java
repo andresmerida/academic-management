@@ -14,9 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.am.core.web.util.UtilConstants.DEFAULT_END_TIME_SCHEDULE;
-import static org.am.core.web.util.UtilConstants.DEFAULT_START_TIME_SCHEDULE;
-import static org.am.core.web.util.UtilConstants.DEFAULT_TIME_INTERVAL_SCHEDULE;
+import static org.am.core.web.util.UtilConstants.*;
 
 @Service
 @Transactional
@@ -50,6 +48,11 @@ public class AreaService implements CustomMap<AreaDto, Area> {
                 DEFAULT_START_TIME_SCHEDULE,
                 DEFAULT_END_TIME_SCHEDULE,
                 DEFAULT_TIME_INTERVAL_SCHEDULE,
+                DEFAULT_LUNCH_TIME_SCHEDULE,
+                null,
+                null,
+                DEFAULT_BETWEEN_PERIOD,
+
                 areaPersisted
         );
         areaParametersRepository.save(areaParameters);

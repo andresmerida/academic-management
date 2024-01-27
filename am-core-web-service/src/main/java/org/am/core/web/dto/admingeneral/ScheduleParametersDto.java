@@ -7,5 +7,7 @@ public record ScheduleParametersDto(Integer areaId, String nameArea, String init
                                     Boolean wednesdaySchedule, Boolean thursdaySchedule,
                                     Boolean fridaySchedule, Boolean saturdaySchedule,
                                     Boolean sundaySchedule, LocalTime startTimeSchedule,
-                                    LocalTime endTimeSchedule, Integer timeIntervalSchedule) {
+                                    LocalTime endTimeSchedule, Integer timeIntervalSchedule,
+                                    Boolean lunchTimeSchedule, LocalTime startLunchTimeSchedule,
+                                    LocalTime endLunchTimeSchedule, Integer betweenPeriod) {
 }

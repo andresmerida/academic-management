@@ -18,6 +18,10 @@ public class ScheduleParametersService implements CustomMap<ScheduleParametersDt
 
     private final AreaParametersRepository areaParametersRepository;
 
+    /*public ScheduleParametersService(AreaParametersRepository areaParametersRepository) {
+        this.areaParametersRepository = areaParametersRepository;
+    }*/
+
     @Transactional(readOnly = true)
     public Optional<ScheduleParametersDto> getScheduleParametersById(Integer areaId) {
         return areaParametersRepository.findById(areaId).map(this::toDto);
@@ -26,6 +30,7 @@ public class ScheduleParametersService implements CustomMap<ScheduleParametersDt
     public ScheduleParametersDto edit(Integer areaId, ScheduleParametersRequest parametersRequest) {
         AreaParameters areaParametersFromDB = areaParametersRepository.findById(areaId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+
         areaParametersFromDB.setMondaySchedule(parametersRequest.mondaySchedule());
         areaParametersFromDB.setTuesdaySchedule(parametersRequest.tuesdaySchedule());
         areaParametersFromDB.setWednesdaySchedule(parametersRequest.wednesdaySchedule());
@@ -36,6 +41,12 @@ public class ScheduleParametersService implements CustomMap<ScheduleParametersDt
         areaParametersFromDB.setStartTimeSchedule(parametersRequest.startTimeSchedule());
         areaParametersFromDB.setEndTimeSchedule(parametersRequest.endTimeSchedule());
         areaParametersFromDB.setTimeIntervalSchedule(parametersRequest.timeIntervalSchedule());
+
+        // Nuevas propiedades
+        areaParametersFromDB.setLunchTimeSchedule(parametersRequest.lunchTimeSchedule());
+        areaParametersFromDB.setStartLunchTimeSchedule(parametersRequest.startLunchTimeSchedule());
+        areaParametersFromDB.setEndLunchTimeSchedule(parametersRequest.endLunchTimeSchedule());
+        areaParametersFromDB.setBetweenPeriod(parametersRequest.betweenPeriod());
 
         return toDto(areaParametersRepository.save(areaParametersFromDB));
     }
@@ -55,9 +66,15 @@ public class ScheduleParametersService implements CustomMap<ScheduleParametersDt
                 areaParameters.getSundaySchedule(),
                 areaParameters.getStartTimeSchedule(),
                 areaParameters.getEndTimeSchedule(),
-                areaParameters.getTimeIntervalSchedule()
+                areaParameters.getTimeIntervalSchedule(),
+                // Nuevas propiedades
+                areaParameters.getLunchTimeSchedule(),
+                areaParameters.getStartLunchTimeSchedule(),
+                areaParameters.getEndLunchTimeSchedule(),
+                areaParameters.getBetweenPeriod()
         );
     }
+
 
     @Override
     public AreaParameters toEntity(ScheduleParametersDto scheduleParametersDto) {
