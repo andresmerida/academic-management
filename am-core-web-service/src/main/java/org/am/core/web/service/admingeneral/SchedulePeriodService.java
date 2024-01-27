@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -19,9 +21,13 @@ public class SchedulePeriodService {
 
     private final SchedulePeriodRepository schedulePeriodRepository;
 
-    public Optional<SchedulePeriodDto> getSchedulePeriodById(SchedulePeriodId id) {
-        return schedulePeriodRepository.findById(id).map(this::toDto);
+    // ... otros métodos del servicio
+
+    public Optional<List<SchedulePeriodDto>> getSchedulePeriodsByAreaId(Integer areaId) {
+        List<SchedulePeriod> schedulePeriods = schedulePeriodRepository.findByAreaId(areaId);
+        return Optional.of(schedulePeriods.stream().map(this::toDto).collect(Collectors.toList()));
     }
+
 
     public SchedulePeriodDto edit(SchedulePeriodId id, SchedulePeriodRequest periodRequest) {
         SchedulePeriod schedulePeriodFromDB = schedulePeriodRepository.findById(id)
