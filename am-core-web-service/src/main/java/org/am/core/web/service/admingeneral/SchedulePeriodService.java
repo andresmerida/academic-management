@@ -21,13 +21,36 @@ public class SchedulePeriodService {
 
     private final SchedulePeriodRepository schedulePeriodRepository;
 
-    // ... otros métodos del servicio
+    /*public SchedulePeriodDto create(SchedulePeriodRequest request) {
+        SchedulePeriod newSchedulePeriod = new SchedulePeriod(
+                request.getStartTime(),
+                request.getEndTime(),
+                request.getWeekday(),
+                request.getActive(),
+                request.getAreaId()
+        );
+
+        SchedulePeriod savedSchedulePeriod = schedulePeriodRepository.save(newSchedulePeriod);
+        return toDto(savedSchedulePeriod);
+    }*/
 
     public Optional<List<SchedulePeriodDto>> getSchedulePeriodsByAreaId(Integer areaId) {
         List<SchedulePeriod> schedulePeriods = schedulePeriodRepository.findByAreaId(areaId);
         return Optional.of(schedulePeriods.stream().map(this::toDto).collect(Collectors.toList()));
     }
 
+
+    public SchedulePeriodDto createOrUpdate(SchedulePeriodRequest request) {
+        // Implementa la lógica para crear o actualizar el período de horario según tus necesidades
+        // Puedes utilizar el repository para guardar la entidad correspondiente
+
+        // Ejemplo:
+        SchedulePeriod schedulePeriod = new SchedulePeriod(request.startTime(), request.endTime(), request.weekday(), request.active(), request.areaId());
+        SchedulePeriod savedSchedulePeriod = schedulePeriodRepository.save(schedulePeriod);
+
+        // Convierte la entidad guardada a DTO y devuélvela
+        return toDto(savedSchedulePeriod);
+    }
 
     public SchedulePeriodDto edit(SchedulePeriodId id, SchedulePeriodRequest periodRequest) {
         SchedulePeriod schedulePeriodFromDB = schedulePeriodRepository.findById(id)

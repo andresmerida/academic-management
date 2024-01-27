@@ -5,6 +5,7 @@ import org.am.core.web.domain.entity.admingeneral.SchedulePeriodId;
 import org.am.core.web.dto.admingeneral.SchedulePeriodRequest;
 import org.am.core.web.dto.admingeneral.SchedulePeriodDto;
 import org.am.core.web.service.admingeneral.SchedulePeriodService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,5 +26,10 @@ public class SchedulePeriodController {
         return ResponseEntity.ok(schedulePeriods);
     }
 
-    // ... otros métodos del controlador
+    @PostMapping
+    public ResponseEntity<SchedulePeriodDto> createOrUpdateSchedulePeriod(
+            @RequestBody final SchedulePeriodRequest request) {
+        // Aquí puedes validar o procesar la solicitud según tus necesidades
+        return ResponseEntity.ok().body(schedulePeriodService.createOrUpdate(request));
+    }
 }
