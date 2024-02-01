@@ -20,7 +20,7 @@ public class Classroom {
     private String type;
     private String address;
     private Boolean active;
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
     private Area area;
 

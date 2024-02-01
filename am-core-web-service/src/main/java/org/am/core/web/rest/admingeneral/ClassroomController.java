@@ -29,38 +29,25 @@ public class ClassroomController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ClassroomDto> getListClassroomByIdByArea(@PathVariable final Integer id){
-        return ResponseEntity.ok(classroomService.getClassroomByIdByArea(id).orElseThrow(()->new IllegalArgumentException("Classroom with "+ id+"not exist")));
+        return ResponseEntity.ok(classroomService.getClassroomById(id).orElseThrow(()->new IllegalArgumentException("Classroom with "+ id+"not exist")));
     }
 
     @PostMapping
     public ResponseEntity<ClassroomDto> createClassroom(@RequestBody final ClassroomRequest classroomRequest) throws URISyntaxException {
         ClassroomDto classroomDB = classroomService.save(classroomRequest);
-        return ResponseEntity.created(new URI("/admin/classroom"+classroomDB.id())).body(classroomDB);
+        return ResponseEntity.created(new URI("/admin/classrooms"+classroomDB.id())).body(classroomDB);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClassroomDto> editClassroom(@RequestBody final ClassroomDto dto, @PathVariable final Integer id){
-        System.out.println(dto.id());
-        if(dto.id()==null){
-            throw new IllegalArgumentException("Invalid classroom ID");
-        }
-        if (!Objects.equals(id, dto.id())){
-            throw new IllegalArgumentException("Invalid ID");
-        }
+    public ResponseEntity<ClassroomDto> editClassroom(@PathVariable final Integer id, @RequestBody final ClassroomRequest classroomRequest){
         return ResponseEntity
                 .ok()
-                .body(classroomService.edit(dto));
+                .body(classroomService.edit(classroomRequest,id));
     }
 
-    @DeleteMapping("/{classroomId}")
-    public ResponseEntity<Void> delete(@PathVariable final Integer classroomId){
-        try{
-            classroomService.delete(classroomId);
-            return ResponseEntity.noContent().build();
-        }catch (DataIntegrityViolationException e){
-            ClassroomDto classroom = classroomService.getClassroomById(classroomId).get();
-            classroomService.editActive(classroom);
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final Integer id){
+        classroomService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

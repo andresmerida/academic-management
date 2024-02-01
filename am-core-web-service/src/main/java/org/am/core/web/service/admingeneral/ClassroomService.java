@@ -1,5 +1,6 @@
 package org.am.core.web.service.admingeneral;
 
+import org.am.core.web.domain.entity.admingeneral.Area;
 import org.am.core.web.domain.entity.admingeneral.Classroom;
 import org.am.core.web.dto.admingeneral.ClassroomDto;
 import org.am.core.web.dto.admingeneral.ClassroomRequest;
@@ -13,7 +14,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional
 public class ClassroomService implements CustomMap<ClassroomDto, Classroom> {
     private final ClassroomRepository classroomRepository;
 
@@ -31,32 +31,24 @@ public class ClassroomService implements CustomMap<ClassroomDto, Classroom> {
                 .collect(Collectors.toList());
     }
 
-    public Optional<ClassroomDto> getClassroomByIdByArea(Integer id){
-        Classroom classroom = classroomRepository.findById(id).orElseThrow();
-        Integer areaId = classroom.getArea().getId();
-
-        List<ClassroomDto> classrooms = getActiveClassroomByAreaId(areaId);
-
-        ClassroomDto foundClassroom = classrooms.stream()
-                .filter(c-> c.id().equals(id))
-                .findFirst()
-                .orElseThrow();
-
-        return Optional.of(foundClassroom);
-    }
 
     public ClassroomDto save(ClassroomRequest classroomRequest){
-        return toDto(classroomRepository.save(this.toEntity(classroomRequest)));
+        return toDto(classroomRepository.save(toEntity(classroomRequest)));
     }
 
-    public ClassroomDto edit(ClassroomDto classroomDto){
-        Classroom classroomFromDB = classroomRepository.findById(classroomDto.id())
-                .orElseThrow(()-> new IllegalArgumentException("Invalid id"));
+    public ClassroomDto edit(ClassroomRequest classroomDto, Integer classroomId){
+        Classroom classroomFromDB = classroomRepository.findById(classroomId)
+                .orElseThrow(()->new IllegalArgumentException("Invalid id"));
         classroomFromDB.setInitials(classroomDto.initials());
         classroomFromDB.setName(classroomDto.name());
         classroomFromDB.setType(classroomDto.type());
-        classroomFromDB.setAddress(classroomDto.address());
-        classroomFromDB.setArea(classroomDto.area());
+        classroomFromDB.setAddress(classroomFromDB.getAddress());
+
+        Area area = new Area();
+        area.setId(classroomDto.areaId());
+
+        classroomFromDB.setArea(area);
+
         return toDto(classroomRepository.save(classroomFromDB));
     }
 
@@ -83,31 +75,28 @@ public class ClassroomService implements CustomMap<ClassroomDto, Classroom> {
                 classroom.getType(),
                 classroom.getAddress(),
                 classroom.getActive(),
-                classroom.getArea()
+                classroom.getArea().getId()
         );
     }
 
     @Override
     public Classroom toEntity(ClassroomDto classroomDto) {
-        Classroom classroom= new Classroom();
-        classroom.setId(classroomDto.id());
-        classroom.setInitials(classroomDto.initials());
-        classroom.setName(classroomDto.name());
-        classroom.setType(classroomDto.type());
-        classroom.setAddress(classroomDto.address());
-        classroom.setActive(classroomDto.active());
-        classroom.setArea(classroomDto.area());
-        return classroom;
+        return null;
     }
 
     private Classroom toEntity(ClassroomRequest classroomRequest){
-        return new Classroom(
-                classroomRequest.initials(),
-                classroomRequest.name(),
-                classroomRequest.type(),
-                Boolean.TRUE,
-                classroomRequest.area(),
-                classroomRequest.address()
-        );
+        Classroom classroom = new Classroom();
+        classroom.setInitials(classroomRequest.initials());
+        classroom.setName(classroomRequest.name());
+        classroom.setType(classroomRequest.type());
+        classroom.setAddress(classroomRequest.address());
+        classroom.setActive(Boolean.TRUE);
+
+        Area area= new Area();
+        area.setId(classroomRequest.areaId());
+
+        classroom.setArea(area);
+
+        return classroom;
     }
 }
