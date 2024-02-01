@@ -42,12 +42,7 @@ public class ClassroomService implements CustomMap<ClassroomDto, Classroom> {
         classroomFromDB.setInitials(classroomDto.initials());
         classroomFromDB.setName(classroomDto.name());
         classroomFromDB.setType(classroomDto.type());
-        classroomFromDB.setAddress(classroomFromDB.getAddress());
-
-        Area area = new Area();
-        area.setId(classroomDto.areaId());
-
-        classroomFromDB.setArea(area);
+        classroomFromDB.setAddress(classroomDto.address());
 
         return toDto(classroomRepository.save(classroomFromDB));
     }
@@ -74,7 +69,6 @@ public class ClassroomService implements CustomMap<ClassroomDto, Classroom> {
                 classroom.getName(),
                 classroom.getType(),
                 classroom.getAddress(),
-                classroom.getActive(),
                 classroom.getArea().getId()
         );
     }
