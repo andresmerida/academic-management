@@ -14,7 +14,6 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/admin/areas/{areaID}/academic-periods")
-
 public class AcademicPeriodController {
     private final AcademicPeriodService academicPeriodService;
 
@@ -26,7 +25,6 @@ public class AcademicPeriodController {
     @GetMapping
     public ResponseEntity<List<AcademicPeriodDto>> listAcademicPeriodByArea(@PathVariable final Integer areaID) {
         return ResponseEntity.ok().body(academicPeriodService.getActiveAcademicPeriodsByAreaId(areaID));
-
     }
 
     @GetMapping("/{id}")
@@ -36,6 +34,7 @@ public class AcademicPeriodController {
 
     @PostMapping
     public ResponseEntity<AcademicPeriodDto> createAcademicPeriod(@RequestBody final AcademicPeriodRequest academicPeriodRequest) throws URISyntaxException {
+
         AcademicPeriodDto academicPeriodDtoDB = academicPeriodService.save(academicPeriodRequest);
 
         return ResponseEntity.created(new URI("/admin/academicPeriod" + academicPeriodDtoDB.id())).body(academicPeriodDtoDB);
@@ -44,7 +43,7 @@ public class AcademicPeriodController {
     @PutMapping("/{id}")
     public ResponseEntity<AcademicPeriodDto> editAcademicPeriod(@RequestBody final AcademicPeriodDto dto, @PathVariable final Integer id) {
         if (dto.id() == null) {
-               throw new IllegalArgumentException("Invalid academicPeriod ID");
+            throw new IllegalArgumentException("Invalid academicPeriod ID");
         }
 
         if (!Objects.equals(id, dto.id())) {
@@ -58,7 +57,7 @@ public class AcademicPeriodController {
 
     @DeleteMapping("/{academic_period_id}")
     public ResponseEntity<Void> delete(@PathVariable final Integer academic_period_id) {
-    
+
         try {
             academicPeriodService.delete(academic_period_id);
             return ResponseEntity.noContent().build();
