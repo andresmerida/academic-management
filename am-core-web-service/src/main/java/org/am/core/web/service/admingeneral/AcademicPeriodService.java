@@ -10,7 +10,6 @@ import org.am.core.web.repository.jpa.admingeneral.AreaRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLOutput;
 import java.time.Year;
 import java.util.List;
 import java.util.Optional;
@@ -107,8 +106,7 @@ public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, Acade
     }
     private AcademicPeriod toEntity(AcademicPeriodRequest academicPeriodRequest) {
         
-        Area area= new Area();
-        area=areaRepository.getReferenceById(academicPeriodRequest.areaId());
+        Area area= areaRepository.getReferenceById(academicPeriodRequest.areaId());
         Year year = Year.of(academicPeriodRequest.year());
         return new AcademicPeriod(
                 year,
