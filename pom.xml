@@ -18,7 +18,6 @@
         <module>am-util</module>
     </modules>
 
-
     <version>${revision}</version>
 
     <properties>
