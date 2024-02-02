@@ -28,11 +28,12 @@ public class AcademicPeriod {
     @JoinColumn(name = "area_id")
     private Area area;
 
-    public AcademicPeriod(Year year, String name, LocalDate startDate, LocalDate endDate, Boolean active) {
+    public AcademicPeriod(Year year, String name, LocalDate startDate, LocalDate endDate, Area area) {
         this.year=year;
         this.name=name;
         this.startDate=startDate;
         this.endDate=endDate;
-        this.active=active;
+        this.active=true;
+        this.area=area;
     }
 }

@@ -1,17 +1,13 @@
 package org.am.core.web.service.admingeneral;
 
 
-import org.am.core.web.domain.entity.admingeneral.Area;
 import org.am.core.web.domain.entity.admingeneral.Career;
 import org.am.core.web.dto.admingeneral.CareerDto;
 import org.am.core.web.dto.admingeneral.CareerRequest;
 import org.am.core.web.repository.jpa.CustomMap;
-import org.am.core.web.repository.jpa.admingeneral.AreaRepository;
 import org.am.core.web.repository.jpa.admingeneral.CareerRepository;
-import org.springframework.data.jdbc.core.JdbcAggregateOperations;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +18,7 @@ public class CareerService implements CustomMap<CareerDto, Career> {
     private final CareerRepository careerRepository;
 
 
-
-    public CareerService(CareerRepository careerRepository, AreaRepository areaRepository) {
+    public CareerService(CareerRepository careerRepository) {
         this.careerRepository = careerRepository;
     }
 
@@ -68,11 +63,8 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         careerFromDB.setName(careerDto.name());
         careerFromDB.setInitials(careerDto.initials());
         careerFromDB.setDescription(careerDto.description());
-        careerFromDB.setCreationDate(careerDto.creationDate());
-
-        Area area = new Area();
-        area.setId(careerDto.areaId());
-        careerFromDB.setArea(area);
+        careerFromDB.setCode(careerDto.code());
+        careerFromDB.setArea(careerDto.area());
         return toDto(careerRepository.save(careerFromDB));
     }
 
@@ -101,26 +93,32 @@ public class CareerService implements CustomMap<CareerDto, Career> {
                 career.getDescription(),
                 career.getCreationDate(),
                 career.getActive(),
-                career.getArea().getId()
+                career.getCode(),
+                career.getArea()
         );
     }
 
     @Override
     public Career toEntity(CareerDto careerDto) {
-        return null;
+        Career career = new Career();
+        career.setId(careerDto.id());
+        career.setName(careerDto.name());
+        career.setInitials(careerDto.initials());
+        career.setDescription(careerDto.description());
+        career.setActive(careerDto.active());
+        career.setArea(careerDto.area());
+        return career;
     }
 
     private Career toEntity(CareerRequest careerRequest) {
-        Career career = new Career();
-                career.setName(careerRequest.name());
-               career.setInitials(careerRequest.initials());
-                career.setDescription(careerRequest.description());
-                career.setActive(Boolean.TRUE);
-                career.setCreationDate(careerRequest.creationDate());
-                Area area = new Area();
-                area.setId(careerRequest.areaId());
-                career.setArea(area);
-                return career;
-
+        return new Career(
+                careerRequest.name(),
+                careerRequest.initials(),
+                careerRequest.description(),
+                Boolean.TRUE,
+                careerRequest.code(),
+                LocalDateTime.now(),
+                careerRequest.area()
+        );
     }
 }
