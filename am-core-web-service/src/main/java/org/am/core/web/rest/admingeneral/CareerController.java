@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.am.core.web.dto.admingeneral.CareerDto;
 import org.am.core.web.dto.admingeneral.CareerRequest;
 import org.am.core.web.service.admingeneral.CareerService;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,16 +59,6 @@ public class CareerController {
     public ResponseEntity<Void> delete(@PathVariable final Integer careerid) {
         careerService.delete(careerid);
         return ResponseEntity.noContent().build();
-        /*
-        try {
-            careerService.delete(careerid);
-            return ResponseEntity.noContent().build();
-        } catch (DataIntegrityViolationException e) {
-            CareerDto career = careerService.getCareerById(careerid).get();
-            careerService.editActive(career);
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-         */
     }
 }
 
