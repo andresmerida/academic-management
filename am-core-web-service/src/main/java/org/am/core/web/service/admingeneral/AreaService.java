@@ -70,7 +70,7 @@ public class AreaService implements CustomMap<AreaDto, Area> {
     }
 
     public void delete(Integer id) {
-        // areaParametersRepository.deleteById(id);
+        areaParametersRepository.deleteById(id);
         areaRepository.deleteById(id);
     }
 

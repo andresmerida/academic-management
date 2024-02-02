@@ -1,13 +1,17 @@
 package org.am.core.web.service.admingeneral;
 
 import org.am.core.web.domain.entity.admingeneral.AcademicPeriod;
+import org.am.core.web.domain.entity.admingeneral.Area;
 import org.am.core.web.dto.admingeneral.AcademicPeriodDto;
 import org.am.core.web.dto.admingeneral.AcademicPeriodRequest;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.admingeneral.AcademicPeriodRepository;
+import org.am.core.web.repository.jpa.admingeneral.AreaRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLOutput;
+import java.time.Year;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -15,18 +19,20 @@ import java.util.stream.Collectors;
 @Service
 public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, AcademicPeriod> {
     private final AcademicPeriodRepository academicPeriodRepository;
+    private final AreaRepository areaRepository;
 
-    public AcademicPeriodService(AcademicPeriodRepository academicPeriodRepository) {
+    public AcademicPeriodService(AcademicPeriodRepository academicPeriodRepository, AreaRepository areaRepository) {
         this.academicPeriodRepository = academicPeriodRepository;
+        this.areaRepository=areaRepository;
     }
 
-    @SuppressWarnings("UnresolvedClassReferenceRepair")
     public List<AcademicPeriodDto> getActiveAcademicPeriodsByAreaId(Integer areaID) {
         List<AcademicPeriod> listaAcademicPeriods = academicPeriodRepository.findAllByArea_IdOrderById(areaID);
 
         List<AcademicPeriod> academicPeriods = listaAcademicPeriods.stream()
                 .filter(c -> c.getActive().equals(Boolean.TRUE))
                 .collect(Collectors.toList());
+
 
         return academicPeriods.stream()
                 .map(this::toDto)
@@ -51,7 +57,6 @@ public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, Acade
         academicPeriod.setStartDate(academicPeriodDto.startDate());
         academicPeriod.setEndDate(academicPeriodDto.endDate());
         academicPeriod.setActive(academicPeriodDto.active());
-
         return toDto(academicPeriodRepository.save(academicPeriod));
 
     }
@@ -98,16 +103,19 @@ public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, Acade
        academicPeriod.setStartDate(academicPeriodDto.startDate());
        academicPeriod.setEndDate(academicPeriodDto.endDate());
        academicPeriod.setActive(academicPeriodDto.active());
-
        return academicPeriod;
     }
     private AcademicPeriod toEntity(AcademicPeriodRequest academicPeriodRequest) {
+        
+        Area area= new Area();
+        area=areaRepository.getReferenceById(academicPeriodRequest.areaId());
+        Year year = Year.of(academicPeriodRequest.year());
         return new AcademicPeriod(
-                academicPeriodRequest.year(),
+                year,
                 academicPeriodRequest.name(),
                 academicPeriodRequest.startDate(),
                 academicPeriodRequest.endDate(),
-                academicPeriodRequest.active()
+                area
         );
     }
 }
