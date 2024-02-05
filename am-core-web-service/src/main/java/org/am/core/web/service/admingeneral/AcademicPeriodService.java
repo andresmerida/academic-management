@@ -1,80 +1,64 @@
 package org.am.core.web.service.admingeneral;
 
+import lombok.RequiredArgsConstructor;
 import org.am.core.web.domain.entity.admingeneral.AcademicPeriod;
+import org.am.core.web.domain.entity.admingeneral.Area;
 import org.am.core.web.dto.admingeneral.AcademicPeriodDto;
 import org.am.core.web.dto.admingeneral.AcademicPeriodRequest;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.admingeneral.AcademicPeriodRepository;
-import org.springframework.data.domain.Sort;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Transactional
 @Service
+@RequiredArgsConstructor
 public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, AcademicPeriod> {
     private final AcademicPeriodRepository academicPeriodRepository;
 
-    public AcademicPeriodService(AcademicPeriodRepository academicPeriodRepository) {
-        this.academicPeriodRepository = academicPeriodRepository;
-    }
+    @Transactional(readOnly = true)
+    public List<AcademicPeriodDto> getAcademicPeriodsActiveByAreaId(Integer areaID) {
 
-    @SuppressWarnings("UnresolvedClassReferenceRepair")
-    public List<AcademicPeriodDto> getActiveAcademicPeriodsByAreaId(Integer areaID) {
-        List<AcademicPeriod> listaAcademicPeriods = academicPeriodRepository.findAllByArea_IdOrderById(areaID);
-
-        List<AcademicPeriod> academicPeriods = listaAcademicPeriods.stream()
-                .filter(c -> c.getActive().equals(Boolean.TRUE))
-                .collect(Collectors.toList());
-
-        return academicPeriods.stream()
+        return academicPeriodRepository.findAllByAreaIdAndActiveOrderById(areaID, Boolean.TRUE).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
-    public List<AcademicPeriodDto> findAll(){
-        return  academicPeriodRepository.findAll()
-                .stream()
-                .map(this::toDto).collect(Collectors.toList());
 
-    }
-
-    public AcademicPeriodDto save (AcademicPeriodRequest academicPeriodRequest){
+    public AcademicPeriodDto save(AcademicPeriodRequest academicPeriodRequest){
         return toDto(academicPeriodRepository.save(this.toEntity(academicPeriodRequest)));
     }
 
     public AcademicPeriodDto edit(AcademicPeriodDto academicPeriodDto){
-        AcademicPeriod academicPeriod=academicPeriodRepository.findById(academicPeriodDto.id())
+        AcademicPeriod academicPeriod = academicPeriodRepository.findById(academicPeriodDto.id())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
         academicPeriod.setYear(academicPeriodDto.year());
         academicPeriod.setName(academicPeriodDto.name());
         academicPeriod.setStartDate(academicPeriodDto.startDate());
         academicPeriod.setEndDate(academicPeriodDto.endDate());
-        academicPeriod.setActive(academicPeriodDto.active());
 
         return toDto(academicPeriodRepository.save(academicPeriod));
 
     }
     public void delete(Integer id){
-        academicPeriodRepository.deleteById(id);
-    }
-
-    public Optional<AcademicPeriodDto> getAcademicPeriodById(Integer id){
-        Optional<AcademicPeriod> academicPeriodOptional = academicPeriodRepository.findById(id);
-        if (academicPeriodOptional.isPresent()) {
-            AcademicPeriod academicPeriod = academicPeriodOptional.get();
-            return Optional.of(toDto(academicPeriod));
-        } else {
-            return Optional.empty();
+        try {
+            academicPeriodRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) { // logical delete
+            AcademicPeriod academicPeriod = academicPeriodRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+            academicPeriod.setActive(Boolean.FALSE);
+            academicPeriodRepository.save(academicPeriod);
         }
+
     }
 
-    public List<AcademicPeriodDto> findAllSortedByYearDescending() {
-
-        List<AcademicPeriod> academicPeriods = academicPeriodRepository.findAll(Sort.by(Sort.Direction.DESC, "year"));
-        return academicPeriods.stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
+    @Transactional(readOnly = true)
+    public Optional<AcademicPeriodDto> getAcademicPeriodById(Integer id) {
+        return academicPeriodRepository.findById(id).map(this::toDto);
     }
 
     @Override
@@ -84,30 +68,26 @@ public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, Acade
                 academicPeriod.getYear(),
                 academicPeriod.getName(),
                 academicPeriod.getStartDate(),
-                academicPeriod.getEndDate(),
-                academicPeriod.getActive()
+                academicPeriod.getEndDate()
         );
     }
 
     @Override
     public AcademicPeriod toEntity(AcademicPeriodDto academicPeriodDto) {
-       AcademicPeriod academicPeriod= new AcademicPeriod();
-       academicPeriod.setId(academicPeriodDto.id());
-       academicPeriod.setYear(academicPeriodDto.year());
-       academicPeriod.setName(academicPeriodDto.name());
-       academicPeriod.setStartDate(academicPeriodDto.startDate());
-       academicPeriod.setEndDate(academicPeriodDto.endDate());
-       academicPeriod.setActive(academicPeriodDto.active());
-
-       return academicPeriod;
+       return null;
     }
     private AcademicPeriod toEntity(AcademicPeriodRequest academicPeriodRequest) {
-        return new AcademicPeriod(
-                academicPeriodRequest.year(),
-                academicPeriodRequest.name(),
-                academicPeriodRequest.startDate(),
-                academicPeriodRequest.endDate(),
-                academicPeriodRequest.active()
-        );
+        AcademicPeriod academicPeriod = new AcademicPeriod();
+        academicPeriod.setYear(academicPeriodRequest.year());
+        academicPeriod.setName(academicPeriodRequest.name());
+        academicPeriod.setStartDate(academicPeriodRequest.startDate());
+        academicPeriod.setEndDate(academicPeriodRequest.endDate());
+        academicPeriod.setActive(Boolean.TRUE);
+
+        Area area = new Area();
+        area.setId(academicPeriodRequest.areaId());
+        academicPeriod.setArea(area);
+
+        return academicPeriod;
     }
 }

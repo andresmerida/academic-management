@@ -2,8 +2,6 @@ package org.am.core.web.rest.admingeneral;
 import org.am.core.web.dto.admingeneral.AcademicPeriodDto;
 import org.am.core.web.dto.admingeneral.AcademicPeriodRequest;
 import org.am.core.web.service.admingeneral.AcademicPeriodService;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,20 +22,24 @@ public class AcademicPeriodController {
 
     @GetMapping
     public ResponseEntity<List<AcademicPeriodDto>> listAcademicPeriodByArea(@PathVariable final Integer areaID) {
-        return ResponseEntity.ok().body(academicPeriodService.getActiveAcademicPeriodsByAreaId(areaID));
+        return ResponseEntity.ok().body(academicPeriodService.getAcademicPeriodsActiveByAreaId(areaID));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AcademicPeriodDto> getAcademicPeriodById(@PathVariable final Integer id) {
-        return ResponseEntity.ok(academicPeriodService.getAcademicPeriodById(id).orElseThrow(() -> new IllegalArgumentException("AcademicPeriod with " + id + "not exist")));
+        return ResponseEntity
+                .ok(academicPeriodService.getAcademicPeriodById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("AcademicPeriod with " + id + "not exist")));
     }
 
     @PostMapping
-    public ResponseEntity<AcademicPeriodDto> createAcademicPeriod(@RequestBody final AcademicPeriodRequest academicPeriodRequest) throws URISyntaxException {
+    public ResponseEntity<AcademicPeriodDto> createAcademicPeriod(@RequestBody final AcademicPeriodRequest academicPeriodRequest,
+                                                                  @PathVariable final Integer areaID) throws URISyntaxException {
 
         AcademicPeriodDto academicPeriodDtoDB = academicPeriodService.save(academicPeriodRequest);
 
-        return ResponseEntity.created(new URI("/admin/academicPeriod" + academicPeriodDtoDB.id())).body(academicPeriodDtoDB);
+        return ResponseEntity
+                .created(new URI("/admin/areas/"+areaID+"/academic-periods/" + academicPeriodDtoDB.id())).body(academicPeriodDtoDB);
     }
 
     @PutMapping("/{id}")
@@ -54,16 +56,10 @@ public class AcademicPeriodController {
                 .body(academicPeriodService.edit(dto));
     }
 
-
-    @DeleteMapping("/{academic_period_id}")
-    public ResponseEntity<Void> delete(@PathVariable final Integer academic_period_id) {
-
-        try {
-            academicPeriodService.delete(academic_period_id);
-            return ResponseEntity.noContent().build();
-        } catch (DataIntegrityViolationException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final Integer id) {
+        academicPeriodService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
 
