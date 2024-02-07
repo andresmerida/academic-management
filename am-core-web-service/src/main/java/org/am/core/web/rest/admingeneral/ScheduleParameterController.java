@@ -19,10 +19,6 @@ public class ScheduleParameterController {
 
     private final ScheduleParametersService scheduleParametersService;
 
-    /*public ScheduleParameterController(ScheduleParametersService scheduleParametersService) {
-        this.scheduleParametersService = scheduleParametersService;
-    }*/
-
     @GetMapping("/{areaId}")
     public ResponseEntity<ScheduleParametersDto> getScheduleParametersById(@PathVariable final Integer areaId) {
         return ResponseEntity
@@ -38,4 +34,6 @@ public class ScheduleParameterController {
                                                                         @RequestBody final ScheduleParametersRequest request) {
         return ResponseEntity.ok().body(scheduleParametersService.edit(areaId, request));
     }
+
+
 }

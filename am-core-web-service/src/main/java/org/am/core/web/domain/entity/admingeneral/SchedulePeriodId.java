@@ -10,12 +10,6 @@ public class SchedulePeriodId implements Serializable {
     private String weekday;
     private Integer areaId;
 
-    // Constructores, getters, setters y métodos equals y hashCode aquí...
-
-    // Asegúrate de implementar correctamente equals y hashCode para la comparación
-    // y uso de objetos SchedulePeriodId en conjunto con la clase SchedulePeriod.
-
-
     public LocalTime getStartTime() {
         return startTime;
     }

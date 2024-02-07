@@ -18,10 +18,6 @@ public class ScheduleParametersService implements CustomMap<ScheduleParametersDt
 
     private final AreaParametersRepository areaParametersRepository;
 
-    /*public ScheduleParametersService(AreaParametersRepository areaParametersRepository) {
-        this.areaParametersRepository = areaParametersRepository;
-    }*/
-
     @Transactional(readOnly = true)
     public Optional<ScheduleParametersDto> getScheduleParametersById(Integer areaId) {
         return areaParametersRepository.findById(areaId).map(this::toDto);
@@ -42,7 +38,6 @@ public class ScheduleParametersService implements CustomMap<ScheduleParametersDt
         areaParametersFromDB.setEndTimeSchedule(parametersRequest.endTimeSchedule());
         areaParametersFromDB.setTimeIntervalSchedule(parametersRequest.timeIntervalSchedule());
 
-        // Nuevas propiedades
         areaParametersFromDB.setLunchTimeSchedule(parametersRequest.lunchTimeSchedule());
         areaParametersFromDB.setStartLunchTimeSchedule(parametersRequest.startLunchTimeSchedule());
         areaParametersFromDB.setEndLunchTimeSchedule(parametersRequest.endLunchTimeSchedule());
@@ -67,7 +62,7 @@ public class ScheduleParametersService implements CustomMap<ScheduleParametersDt
                 areaParameters.getStartTimeSchedule(),
                 areaParameters.getEndTimeSchedule(),
                 areaParameters.getTimeIntervalSchedule(),
-                // Nuevas propiedades
+
                 areaParameters.getLunchTimeSchedule(),
                 areaParameters.getStartLunchTimeSchedule(),
                 areaParameters.getEndLunchTimeSchedule(),

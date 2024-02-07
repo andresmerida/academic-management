@@ -31,12 +31,6 @@ public class SchedulePeriod{
 
     @Column(name = "area_id")
     private Integer areaId;
-    //@ManyToOne(fetch = FetchType.LAZY)
-    //@JoinColumn(name = "area_id", nullable = false)
-    //private AreaParameters areaParameters;
-
-    // Constructores, getters y setters
-
     public SchedulePeriod(LocalTime startTime, LocalTime endTime, String weekday, Boolean active, Integer areaId) {
         this.startTime = startTime;
         this.endTime = endTime;

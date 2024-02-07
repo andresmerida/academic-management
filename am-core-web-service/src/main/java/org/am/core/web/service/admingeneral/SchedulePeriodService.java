@@ -21,34 +21,20 @@ public class SchedulePeriodService {
 
     private final SchedulePeriodRepository schedulePeriodRepository;
 
-    /*public SchedulePeriodDto create(SchedulePeriodRequest request) {
-        SchedulePeriod newSchedulePeriod = new SchedulePeriod(
-                request.getStartTime(),
-                request.getEndTime(),
-                request.getWeekday(),
-                request.getActive(),
-                request.getAreaId()
-        );
-
-        SchedulePeriod savedSchedulePeriod = schedulePeriodRepository.save(newSchedulePeriod);
-        return toDto(savedSchedulePeriod);
-    }*/
-
     public Optional<List<SchedulePeriodDto>> getSchedulePeriodsByAreaId(Integer areaId) {
         List<SchedulePeriod> schedulePeriods = schedulePeriodRepository.findByAreaId(areaId);
         return Optional.of(schedulePeriods.stream().map(this::toDto).collect(Collectors.toList()));
     }
 
+    public void deleteByAreaId(Integer areaId) {
+        schedulePeriodRepository.deleteByAreaId(areaId);
+    }
+
 
     public SchedulePeriodDto createOrUpdate(SchedulePeriodRequest request) {
-        // Implementa la lógica para crear o actualizar el período de horario según tus necesidades
-        // Puedes utilizar el repository para guardar la entidad correspondiente
-
-        // Ejemplo:
         SchedulePeriod schedulePeriod = new SchedulePeriod(request.startTime(), request.endTime(), request.weekday(), request.active(), request.areaId());
         SchedulePeriod savedSchedulePeriod = schedulePeriodRepository.save(schedulePeriod);
 
-        // Convierte la entidad guardada a DTO y devuélvela
         return toDto(savedSchedulePeriod);
     }
 
@@ -60,14 +46,13 @@ public class SchedulePeriodService {
         schedulePeriodFromDB.setEndTime(periodRequest.endTime());
         schedulePeriodFromDB.setWeekday(periodRequest.weekday());
         schedulePeriodFromDB.setActive(periodRequest.active());
-        // Setea la relación con AreaParameters si es necesario
+
 
         return toDto(schedulePeriodRepository.save(schedulePeriodFromDB));
     }
 
     private SchedulePeriodDto toDto(SchedulePeriod schedulePeriod) {
-        // Implementa la conversión a DTO según tu lógica
-        // Puedes basarte en la implementación de toDto en ScheduleParametersService
+
         return new SchedulePeriodDto(
                 schedulePeriod.getStartTime(),
                 schedulePeriod.getEndTime(),
