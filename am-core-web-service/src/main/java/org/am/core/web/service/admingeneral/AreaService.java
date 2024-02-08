@@ -7,6 +7,7 @@ import org.am.core.web.dto.admingeneral.AreaRequest;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.admingeneral.AreaParametersRepository;
 import org.am.core.web.repository.jpa.admingeneral.AreaRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,8 +71,15 @@ public class AreaService implements CustomMap<AreaDto, Area> {
     }
 
     public void delete(Integer id) {
-        // areaParametersRepository.deleteById(id);
-        areaRepository.deleteById(id);
+        try {
+            areaParametersRepository.deleteById(id);
+            areaRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            Area area = areaRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid Id"));
+            area.setActive(false);
+            areaRepository.save(area);
+        }
     }
 
     @Override
@@ -79,7 +87,8 @@ public class AreaService implements CustomMap<AreaDto, Area> {
         return new AreaDto(
                 area.getId(),
                 area.getName(),
-                area.getInitials()
+                area.getInitials(),
+                area.getDescription()
         );
     }
 
@@ -89,6 +98,7 @@ public class AreaService implements CustomMap<AreaDto, Area> {
         area.setId(areaDto.id());
         area.setName(areaDto.name());
         area.setInitials(areaDto.initials());
+        area.setDescription(areaDto.description());
         return area;
     }
 
@@ -96,7 +106,8 @@ public class AreaService implements CustomMap<AreaDto, Area> {
         return new Area(
                 areaRequest.name(),
                 areaRequest.initials(),
-                Boolean.TRUE
+                Boolean.TRUE,
+                areaRequest.description()
         );
     }
 }
