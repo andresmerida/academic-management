@@ -22,7 +22,8 @@ public class Group {
     private Integer id;
     private String identifier;
     private String remark;
-
+    @Column(name = "curriculum_id")
+    private Integer curriculumId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itinerary_id")

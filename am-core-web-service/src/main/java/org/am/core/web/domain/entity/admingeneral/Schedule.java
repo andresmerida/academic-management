@@ -20,9 +20,9 @@ public class Schedule {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schedule_sequence")
     private Integer id;
     @Column(name = "start_time")
-    private LocalTime start_time;
+    private LocalTime startTime;
     @Column(name = "end_time")
-    private LocalTime end_time;
+    private LocalTime endTime;
     private String weekday;
     private String assistant;
 
@@ -38,19 +38,17 @@ public class Schedule {
     @JoinColumn(name = "professor_id")
     private Professor professor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "itinerary_id")
-    private Itinerary itinerary;
 
-    public Schedule(LocalTime start_time, LocalTime end_time, String weekday, String assistant,
-                    Classroom classroom, Group group, Professor professor, Itinerary itinerary) {
-        this.start_time = start_time;
-        this.end_time = end_time;
+
+    public Schedule(LocalTime startTime, LocalTime endTime, String weekday, String assistant,
+                    Classroom classroom, Group group, Professor professor) {
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.weekday = weekday;
         this.assistant = assistant;
         this.classroom = classroom;
         this.group = group;
         this.professor = professor;
-        this.itinerary = itinerary;
+
     }
 }
