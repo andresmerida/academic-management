@@ -52,7 +52,6 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         try {
             careerRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            // logical delete
             Career careerFromDB = careerRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
             careerFromDB.setActive(Boolean.FALSE);

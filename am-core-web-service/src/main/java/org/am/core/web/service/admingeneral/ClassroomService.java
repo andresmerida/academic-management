@@ -1,11 +1,15 @@
 package org.am.core.web.service.admingeneral;
 
 import org.am.core.web.domain.entity.admingeneral.Area;
+import org.am.core.web.domain.entity.admingeneral.Career;
 import org.am.core.web.domain.entity.admingeneral.Classroom;
+import org.am.core.web.domain.entity.admingeneral.Schedule;
 import org.am.core.web.dto.admingeneral.ClassroomDto;
 import org.am.core.web.dto.admingeneral.ClassroomRequest;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.admingeneral.ClassroomRepository;
+import org.am.core.web.repository.jpa.admingeneral.ScheduleRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +20,11 @@ import java.util.stream.Collectors;
 @Service
 public class ClassroomService implements CustomMap<ClassroomDto, Classroom> {
     private final ClassroomRepository classroomRepository;
+    private final ScheduleRepository scheduleRepository;
 
-    public ClassroomService(ClassroomRepository classroomRepository) {
+    public ClassroomService(ClassroomRepository classroomRepository, ScheduleRepository scheduleRepository) {
         this.classroomRepository = classroomRepository;
+        this.scheduleRepository = scheduleRepository;
     }
 
     public List<ClassroomDto> getActiveClassroomByAreaId(Integer areaId){
@@ -55,7 +61,16 @@ public class ClassroomService implements CustomMap<ClassroomDto, Classroom> {
     }
 
     public void delete(Integer id){
-        classroomRepository.deleteById(id);
+        try {
+            classroomRepository.deleteById(id);
+        }catch (DataIntegrityViolationException e){
+            List<Schedule> schedules = scheduleRepository.findByClassroomId(id);
+            scheduleRepository.deleteAll(schedules);
+            Classroom classroomFromDB = classroomRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+            classroomFromDB.setActive(Boolean.FALSE);
+            classroomRepository.save(classroomFromDB);
+        }
     }
 
     public Optional<ClassroomDto> getClassroomById(Integer id){
