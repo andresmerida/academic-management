@@ -1,15 +1,16 @@
 package org.am.core.web.service.admingeneral;
 
 
+import org.am.core.web.domain.entity.admingeneral.Area;
 import org.am.core.web.domain.entity.admingeneral.Career;
 import org.am.core.web.dto.admingeneral.CareerDto;
 import org.am.core.web.dto.admingeneral.CareerRequest;
 import org.am.core.web.repository.jpa.CustomMap;
+import org.am.core.web.repository.jpa.admingeneral.AreaRepository;
 import org.am.core.web.repository.jpa.admingeneral.CareerRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,40 +20,18 @@ public class CareerService implements CustomMap<CareerDto, Career> {
     private final CareerRepository careerRepository;
 
 
-    public CareerService(CareerRepository careerRepository) {
+
+    public CareerService(CareerRepository careerRepository, AreaRepository areaRepository) {
         this.careerRepository = careerRepository;
     }
 
-    public List<CareerDto> getActiveCareersByAreaId(Integer areaID) {
-        List<Career> careers = careerRepository.findAllByArea_IdOrderById(areaID);
+    public List<CareerDto> getCareersByAreaIdAndActive(Integer areaID) {
+        List<Career> careers = careerRepository.findAllByArea_IdAndActiveOrderByName(areaID, Boolean.TRUE);
 
-        List<Career> activeCareers = careers.stream()
-                .filter(c -> c.getActive().equals(Boolean.TRUE))
-                .collect(Collectors.toList());
-
-        return activeCareers.stream()
+        return careers.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
-
-    public Optional<CareerDto> getCareerByIdByArea(Integer id) {
-
-        Career career = careerRepository.findById(id).orElseThrow();
-        Integer areaId = career.getArea().getId();
-
-        List<CareerDto> careers = getActiveCareersByAreaId(areaId);
-
-        CareerDto foundCareer = careers.stream()
-                .filter(c -> c.id().equals(id))
-                .findFirst()
-                .orElseThrow();
-
-        return Optional.of(foundCareer);
-
-    }
-
-
-
 
     public CareerDto save(CareerRequest careerRequest) {
         return toDto(careerRepository.save(this.toEntity(careerRequest)));
@@ -65,21 +44,20 @@ public class CareerService implements CustomMap<CareerDto, Career> {
         careerFromDB.setInitials(careerDto.initials());
         careerFromDB.setDescription(careerDto.description());
         careerFromDB.setCreationDate(careerDto.creationDate());
-        careerFromDB.setCode(careerDto.code());
-        careerFromDB.setArea(careerDto.area());
+
         return toDto(careerRepository.save(careerFromDB));
     }
-
-    public CareerDto editActive(CareerDto careerDto) {
-        Career careerFromDB = careerRepository.findById(careerDto.id())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
-        careerFromDB.setActive(false);
-        return toDto(careerRepository.save(careerFromDB));
-    }
-
 
     public void delete(Integer id) {
-        careerRepository.deleteById(id);
+        try {
+            careerRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
+            // logical delete
+            Career careerFromDB = careerRepository.findById(id)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+            careerFromDB.setActive(Boolean.FALSE);
+            careerRepository.save(careerFromDB);
+        }
     }
 
     public Optional<CareerDto> getCareerById(Integer id) {
@@ -93,35 +71,27 @@ public class CareerService implements CustomMap<CareerDto, Career> {
                 career.getName(),
                 career.getInitials(),
                 career.getDescription(),
-                career.getCreationDate(),
-                career.getActive(),
-                career.getCode(),
-                career.getArea()
+                career.getCreationDate()
         );
     }
 
     @Override
     public Career toEntity(CareerDto careerDto) {
-        Career career = new Career();
-        career.setId(careerDto.id());
-        career.setName(careerDto.name());
-        career.setInitials(careerDto.initials());
-        career.setDescription(careerDto.description());
-        career.setCreationDate(careerDto.creationDate());
-        career.setActive(careerDto.active());
-        career.setArea(careerDto.area());
-        return career;
+        return null;
     }
 
     private Career toEntity(CareerRequest careerRequest) {
-        return new Career(
-                careerRequest.name(),
-                careerRequest.initials(),
-                careerRequest.description(),
-                Boolean.TRUE,
-                careerRequest.code(),
-                LocalDate.now(),
-                careerRequest.area()
-        );
+        Career career = new Career();
+        career.setName(careerRequest.name());
+        career.setInitials(careerRequest.initials());
+        career.setDescription(careerRequest.description());
+        career.setActive(Boolean.TRUE);
+        career.setCreationDate(careerRequest.creationDate());
+
+        Area area = new Area();
+        area.setId(careerRequest.areaId());
+        career.setArea(area);
+
+        return career;
     }
 }

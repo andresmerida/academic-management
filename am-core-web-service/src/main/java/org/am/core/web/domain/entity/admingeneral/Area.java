@@ -19,10 +19,12 @@ public class Area {
     private String name;
     private String initials;
     private Boolean active;
+    private String description;
 
-    public Area(String name, String initials, Boolean active) {
+    public Area(String name, String initials, Boolean active, String description) {
         this.name = name;
         this.initials = initials;
         this.active = active;
+        this.description = description;
     }
 }

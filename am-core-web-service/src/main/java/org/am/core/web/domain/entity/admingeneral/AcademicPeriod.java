@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.time.Year;
 
 @Entity
 @Table(name = "academic_period")
@@ -18,21 +17,24 @@ public class AcademicPeriod {
     @SequenceGenerator(name = "academic_period_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "academic_period_sequence")
     private Integer id;
-    private Year year;
+    private Integer year;
     private String name;
+    @Column(name = "start_date")
     private LocalDate startDate;
+    @Column(name = "end_date")
     private LocalDate endDate;
     private Boolean active;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
     private Area area;
 
-    public AcademicPeriod(Year year, String name, LocalDate startDate, LocalDate endDate, Boolean active) {
-        this.year=year;
-        this.name=name;
-        this.startDate=startDate;
-        this.endDate=endDate;
-        this.active=active;
+    public AcademicPeriod(Integer year, String name, LocalDate startDate, LocalDate endDate, Boolean active, Area area) {
+        this.year = year;
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.active = active;
+        this.area = area;
     }
 }

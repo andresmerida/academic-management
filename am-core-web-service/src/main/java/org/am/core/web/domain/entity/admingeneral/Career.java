@@ -21,7 +21,6 @@ public class Career {
     private String initials;
     private String description;
     private Boolean active;
-    private String code;
     @Column(name = "creation_date")
     private LocalDate creationDate;
     @ManyToOne(fetch = FetchType.EAGER)
@@ -29,13 +28,12 @@ public class Career {
     private Area area;
 
 
-    public Career(String name, String initials, String description, Boolean active, String code, LocalDate creationDate, Area area) {
+    public Career(String name, String initials, String description, Boolean active, LocalDate creationDate, Area area) {
 
         this.name = name;
         this.initials = initials;
         this.description = description;
         this.active = active;
-        this.code = code;
         this.creationDate = creationDate;
         this.area = area;
     }
