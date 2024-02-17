@@ -3,9 +3,10 @@ package org.am.core.web.dto.schedule;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 
-public record ScheduleDto(DayOfWeek dayOfWeek,
-                          LocalTime start_time,
-                          LocalTime end_time,
+public record ScheduleDto(Integer id,
+                          DayOfWeek dayOfWeek,
+                          LocalTime startTime,
+                          LocalTime endTime,
                           String classroomName,
                           String classroomInitials,
                           String professorFullName) {

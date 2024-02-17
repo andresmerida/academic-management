@@ -8,5 +8,6 @@ public record ScheduleRequest(DayOfWeek dayOfWeek,
                               LocalTime end_time,
                               Integer professorId,
                               String assistant,
-                              Integer classroomId) {
+                              Integer classroomId,
+                              Integer groupItineraryId) {
 }
