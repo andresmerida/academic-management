@@ -8,5 +8,4 @@ import java.util.List;
 
 public interface ScheduleItineraryRepository extends JpaRepository<ScheduleItinerary, Integer> {
 
-
 }

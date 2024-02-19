@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -32,6 +34,9 @@ public class GroupItinerary {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itinerary_id")
     private Itinerary itinerary;
+
+    @OneToMany(mappedBy="groupItinerary", cascade = CascadeType.MERGE)
+    private List<ScheduleItinerary> scheduleItineraries;
 
     public GroupItinerary(String identifier, String remark, SubjectCurriculum subjectCurriculum, Itinerary itinerary) {
         this.identifier = identifier;

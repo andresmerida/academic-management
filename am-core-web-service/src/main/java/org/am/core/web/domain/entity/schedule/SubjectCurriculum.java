@@ -1,9 +1,12 @@
 package org.am.core.web.domain.entity.schedule;
 
+import ch.qos.logback.core.spi.AbstractComponentTracker;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.am.core.web.domain.entity.admingeneral.Subject;
+import org.am.core.web.repository.jpa.admingeneral.SubjectRepository;
 
 @Entity
 @Getter
@@ -30,4 +33,5 @@ public class SubjectCurriculum {
         this.workload = workload;
         this.active = active;
     }
+
 }

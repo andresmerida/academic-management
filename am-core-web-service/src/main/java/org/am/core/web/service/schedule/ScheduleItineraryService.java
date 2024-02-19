@@ -64,9 +64,12 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
 
     @Override
     public ScheduleDto toDto(ScheduleItinerary scheduleItinerary) {
-        String professorFullName = scheduleItinerary.getProfessor().getName() + " " +
-                scheduleItinerary.getProfessor().getLastName() + " " +
-                scheduleItinerary.getProfessor().getSecondLastName();
+        String professorFullName = "";
+        if (scheduleItinerary.getProfessor() != null) {
+            professorFullName = scheduleItinerary.getProfessor().getName() + " " +
+                    scheduleItinerary.getProfessor().getLastName() + " " +
+                    scheduleItinerary.getProfessor().getSecondLastName();
+        }
 
         return new ScheduleDto(
                 scheduleItinerary.getId(),
@@ -91,8 +94,11 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         scheduleItinerary.setStartTime(scheduleRequest.start_time());
         scheduleItinerary.setEndTime(scheduleRequest.end_time());
 
-        Professor professor = new Professor();
-        professor.setId(scheduleRequest.professorId());
+        Professor professor = null;
+        if(scheduleRequest.professorId() != null) {
+            professor = new Professor();
+            professor.setId(scheduleRequest.professorId());
+        }
         scheduleItinerary.setProfessor(professor);
 
         scheduleItinerary.setAssistant(scheduleRequest.assistant());

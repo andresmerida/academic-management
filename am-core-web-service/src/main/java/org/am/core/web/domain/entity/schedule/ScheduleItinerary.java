@@ -35,7 +35,7 @@ public class ScheduleItinerary {
     @JoinColumn(name = "classroom_id")
     private Classroom classroom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "professor_id")
     private Professor professor;
 

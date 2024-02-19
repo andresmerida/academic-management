@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.am.core.web.domain.entity.admingeneral.Subject;
 
 import java.io.Serializable;
 
