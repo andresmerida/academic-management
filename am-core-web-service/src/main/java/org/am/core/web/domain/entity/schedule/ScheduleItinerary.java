@@ -18,8 +18,8 @@ import java.time.LocalTime;
 public class ScheduleItinerary {
 
     @Id
-    @SequenceGenerator(name = "group_itinerary_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "group_itinerary_sequence")
+    @SequenceGenerator(name = "schedule_itinerary_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "schedule_itinerary_sequence")
     private Integer id;
 
     @Column(name = "start_time")
