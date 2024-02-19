@@ -2,21 +2,14 @@ package org.am.core.web.service.schedule;
 
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.domain.entity.admingeneral.Classroom;
-import org.am.core.web.domain.entity.admingeneral.Subject;
 import org.am.core.web.domain.entity.schedule.*;
 import org.am.core.web.dto.schedule.GroupDto;
 import org.am.core.web.dto.schedule.GroupRequest;
-import org.am.core.web.dto.schedule.ScheduleDto;
-import org.am.core.web.dto.schedule.ScheduleRequest;
-import org.am.core.web.repository.jdbc.schedule.ScheduleItineraryJdbcRepository;
+import org.am.core.web.repository.jdbc.schedule.GroupItineraryJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
-import org.am.core.web.repository.jpa.admingeneral.SubjectRepository;
 import org.am.core.web.repository.jpa.schedule.GroupItineraryRepository;
-import org.am.core.web.repository.jpa.schedule.ScheduleItineraryRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -25,34 +18,19 @@ import java.util.stream.Collectors;
 public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary> {
 
     private final GroupItineraryRepository groupItineraryRepository;
-    private final SubjectRepository subjectRepository;
-    private final ScheduleItineraryJdbcRepository scheduleItineraryJdbcRepository;
     private final ScheduleItineraryService scheduleItineraryService;
-    private final ScheduleItineraryRepository scheduleItineraryRepository;
-
+    private final GroupItineraryJdbcRepository scheduleItineraryJdbcRepository;
 
     public Optional<GroupDto> getItineraryById(Integer id){
         return groupItineraryRepository.findById(id).map(this::toDto);
     }
 
 
-    public GroupDto save(GroupRequest groupRequest){
-        GroupItinerary groupEntity = toEntity(groupRequest);
-        GroupItinerary savedGroup = groupItineraryRepository.save(groupEntity);
-        if (savedGroup != null) {
-            List<ScheduleItinerary> savedSchedules = groupRequest.listSchedule().stream()
-                    .map(scheduleRequest -> {
-                        ScheduleItinerary scheduleItinerary = scheduleItineraryService.toEntity(scheduleRequest);
-                        scheduleItinerary.setGroupItinerary(savedGroup);
-                        return scheduleItinerary;
-                    })
-                    .collect(Collectors.toList());
+    public GroupDto save(GroupRequest groupRequest) {
+        GroupItinerary savedGroup = groupItineraryRepository.save(toEntity(groupRequest));
+        scheduleItineraryService.saveAll(groupRequest.listSchedule());
+        return toDto(savedGroup);
 
-            scheduleItineraryRepository.saveAll(savedSchedules);
-            return toDto(savedGroup);
-        } else {
-            return null;
-        }
     }
 
     public GroupDto edit(GroupRequest groupDto, Integer groupItineraryId){
@@ -79,22 +57,15 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
         return toDto(groupItineraryRepository.save(groupItineraryFromDB));
     }
 
-
-
     @Override
     public GroupDto toDto(GroupItinerary groupItinerary) {
-        Integer groupItineraryId = groupItinerary.getId();
-
-        List<ScheduleDto> scheduleItineraries = scheduleItineraryJdbcRepository.findAllByGroupItineraryId(groupItineraryId);
-        Integer subjectId =groupItinerary.getSubjectCurriculum().getSubjectCurriculumId().getSubjectId();
-        Optional<Subject> subject = subjectRepository.findById(subjectId);
-
         return new GroupDto(
                 groupItinerary.getSubjectCurriculum().getLevel(),
-                subject.get().getName(),
-                subject.get().getInitials(),
+                groupItinerary.getSubjectCurriculum().getSubject().getName(),
+                groupItinerary.getSubjectCurriculum().getSubject().getInitials(),
                 groupItinerary.getIdentifier(),
-                scheduleItineraries
+                groupItinerary.getScheduleItineraries()
+                        .stream().map(scheduleItineraryService::toDto).collect(Collectors.toList())
         );
     }
 
@@ -121,7 +92,6 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
 
         groupItinerary.setIdentifier(groupRequest.identifier());
         groupItinerary.setRemark(groupRequest.remark());
-
 
         return groupItinerary;
     }

@@ -1,12 +1,12 @@
 package org.am.core.web.domain.entity.schedule;
 
-import ch.qos.logback.core.spi.AbstractComponentTracker;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.am.core.web.domain.entity.admingeneral.Area;
+import org.am.core.web.domain.entity.admingeneral.Curriculum;
 import org.am.core.web.domain.entity.admingeneral.Subject;
-import org.am.core.web.repository.jpa.admingeneral.SubjectRepository;
 
 @Entity
 @Getter
@@ -22,6 +22,14 @@ public class SubjectCurriculum {
     private String path;
     private Short workload;
     private Boolean active;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subject_id")
+    private Subject subject;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "curriculum_id")
+    private Curriculum curriculum;
 
 
     public SubjectCurriculum(SubjectCurriculumId subjectCurriculumId, Short level, Boolean optional,

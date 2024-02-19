@@ -45,8 +45,6 @@ alter table subject_curriculum  add constraint fk_subject_curriculum_ref_subject
 alter table subject_curriculum  add constraint fk_subject_curriculum_ref_curriculum foreign key (curriculum_id)
     references curriculum (id) on delete restrict on update restrict;
 
-
-
 --crear_tabla_grupo
 CREATE TABLE group_itinerary (
                                  id integer not null,
@@ -67,14 +65,12 @@ ALTER TABLE group_itinerary ADD CONSTRAINT fk_group_itinerary_ref_subject_curric
     FOREIGN KEY (curriculum_id, subject_id)
         REFERENCES subject_curriculum (curriculum_id, subject_id);
 
-
-
 --crear_tabla_schedule
 CREATE TABLE schedule_itinerary (
                                     id integer not null,
-                                    start_time TIME NOT NULL,
-                                    end_time TIME NOT NULL,
-                                    weekday SMALLINT NOT NULL,
+                                    start_time TIME,
+                                    end_time TIME,
+                                    weekday SMALLINT,
                                     assistant VARCHAR(100),
                                     classroom_id INTEGER,
                                     professor_id INTEGER,

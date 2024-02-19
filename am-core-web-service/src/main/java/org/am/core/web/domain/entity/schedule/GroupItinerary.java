@@ -38,10 +38,15 @@ public class GroupItinerary {
     @OneToMany(mappedBy="groupItinerary", cascade = CascadeType.MERGE)
     private List<ScheduleItinerary> scheduleItineraries;
 
-    public GroupItinerary(String identifier, String remark, SubjectCurriculum subjectCurriculum, Itinerary itinerary) {
+    public GroupItinerary(String identifier,
+                          String remark,
+                          SubjectCurriculum subjectCurriculum,
+                          Itinerary itinerary,
+                          List<ScheduleItinerary> scheduleItineraries) {
         this.identifier = identifier;
         this.remark = remark;
         this.subjectCurriculum = subjectCurriculum;
         this.itinerary = itinerary;
+        this.scheduleItineraries = scheduleItineraries;
     }
 }

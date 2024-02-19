@@ -1,11 +1,10 @@
 package org.am.core.web.service.schedule;
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.domain.entity.admingeneral.Career;
 import org.am.core.web.domain.entity.admingeneral.Classroom;
 import org.am.core.web.domain.entity.schedule.*;
+import org.am.core.web.domain.entity.users.Professor;
 import org.am.core.web.dto.schedule.*;
-import org.am.core.web.repository.jdbc.schedule.ScheduleItineraryJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.ScheduleItineraryRepository;
 import org.springframework.stereotype.Service;
@@ -13,20 +12,14 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static org.am.core.web.util.CommonUtils.getFullName;
+
 
 @Service
 @RequiredArgsConstructor
 public class ScheduleItineraryService implements CustomMap<ScheduleDto, ScheduleItinerary> {
 
     private final ScheduleItineraryRepository scheduleItineraryRepository;
-    private final ScheduleItineraryJdbcRepository scheduleItineraryJdbcRepository;
-
-
-
-
-    public List<ScheduleDto> listSchedulesItineraryByGroupId(Integer groupId) {
-        return scheduleItineraryJdbcRepository.findAllByGroupItineraryId(groupId);
-    }
 
     public Optional<ScheduleDto> getItineraryById(Integer id){
         return scheduleItineraryRepository.findById(id).map(this::toDto);
@@ -34,6 +27,13 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
 
     public ScheduleDto save(ScheduleRequest scheduleRequest){
         return toDto(scheduleItineraryRepository.save(toEntity(scheduleRequest)));
+    }
+
+    public List<ScheduleDto> saveAll(List<ScheduleRequest> scheduleRequestList) {
+        List<ScheduleItinerary> scheduleItineraryList = scheduleRequestList.stream().map(this::toEntity).toList();
+        return scheduleItineraryRepository.saveAll(scheduleItineraryList)
+                .stream()
+                .map(this::toDto).toList();
     }
 
     public ScheduleDto edit(ScheduleRequest scheduleDto, Integer scheduleItineraryId){
@@ -44,9 +44,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         scheduleItineraryFromDB.setStartTime(scheduleDto.start_time());
         scheduleItineraryFromDB.setEndTime(scheduleDto.end_time());
 
-        Professor professor = new Professor();
-        professor.setId(scheduleDto.professorId());
-        scheduleItineraryFromDB.setProfessor(professor);
+        scheduleItineraryFromDB.setProfessor(buildProfessorById(scheduleDto.professorId()));
 
         scheduleItineraryFromDB.setAssistant(scheduleDto.assistant());
 
@@ -61,14 +59,15 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         return toDto(scheduleItineraryRepository.save(scheduleItineraryFromDB));
     }
 
-
     @Override
     public ScheduleDto toDto(ScheduleItinerary scheduleItinerary) {
-        String professorFullName = "";
+        String fullName = "";
         if (scheduleItinerary.getProfessor() != null) {
-            professorFullName = scheduleItinerary.getProfessor().getName() + " " +
-                    scheduleItinerary.getProfessor().getLastName() + " " +
-                    scheduleItinerary.getProfessor().getSecondLastName();
+            fullName = getFullName(scheduleItinerary.getProfessor().getName(),
+                    scheduleItinerary.getProfessor().getLastName(),
+                    scheduleItinerary.getProfessor().getSecondLastName());
+        } else if (scheduleItinerary.getAssistant() != null && !scheduleItinerary.getAssistant().isEmpty()) {
+            fullName = scheduleItinerary.getAssistant();
         }
 
         return new ScheduleDto(
@@ -78,7 +77,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
                 scheduleItinerary.getEndTime(),
                 scheduleItinerary.getClassroom().getName(),
                 scheduleItinerary.getClassroom().getInitials(),
-                professorFullName
+                fullName
         );
     }
 
@@ -94,12 +93,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         scheduleItinerary.setStartTime(scheduleRequest.start_time());
         scheduleItinerary.setEndTime(scheduleRequest.end_time());
 
-        Professor professor = null;
-        if(scheduleRequest.professorId() != null) {
-            professor = new Professor();
-            professor.setId(scheduleRequest.professorId());
-        }
-        scheduleItinerary.setProfessor(professor);
+        scheduleItinerary.setProfessor(buildProfessorById(scheduleRequest.professorId()));
 
         scheduleItinerary.setAssistant(scheduleRequest.assistant());
 
@@ -114,5 +108,14 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         return scheduleItinerary;
     }
 
+    private Professor buildProfessorById(Integer professorId) {
+        Professor professor = new Professor();
+        if (professorId != null) {
+            professor.setId(professorId);
+        } else {
+            professor = null;
+        }
 
+        return professor;
+    }
 }
