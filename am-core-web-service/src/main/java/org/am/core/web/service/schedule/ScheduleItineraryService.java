@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import static org.am.core.web.util.CommonUtils.getFullName;
 
 
+
 @Service
 @RequiredArgsConstructor
 public class ScheduleItineraryService implements CustomMap<ScheduleDto, ScheduleItinerary> {
@@ -30,6 +31,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
     public ScheduleDto save(ScheduleRequest scheduleRequest){
         return toDto(scheduleItineraryRepository.save(toEntity(scheduleRequest)));
     }
+
 
     public List<ScheduleDto> saveAll(List<ScheduleRequest> scheduleRequestList, GroupItinerary savedGroup) {
 
@@ -46,6 +48,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         return scheduleItineraries.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
+
 
     }
 

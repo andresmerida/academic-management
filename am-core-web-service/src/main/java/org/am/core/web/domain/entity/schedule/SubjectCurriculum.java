@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
 import org.am.core.web.domain.entity.admingeneral.Curriculum;
 import org.am.core.web.domain.entity.admingeneral.Subject;
 
@@ -31,6 +32,7 @@ public class SubjectCurriculum {
     @MapsId("subjectId")
     @JoinColumn(name = "subject_id")
     private Subject subject;
+
 
 
 

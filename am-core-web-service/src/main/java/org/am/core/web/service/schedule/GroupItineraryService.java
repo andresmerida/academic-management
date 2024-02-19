@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary> {
 
     private final GroupItineraryRepository groupItineraryRepository;
     private final ScheduleItineraryService scheduleItineraryService;
+
 
     public Optional<GroupDto> getItineraryById(Integer id){
         return groupItineraryRepository.findById(id).map(this::toDto);
