@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin/group/{groupId}/scheduleItinerary")
@@ -20,11 +19,6 @@ public class ScheduleItineraryController {
     private final ScheduleItineraryService scheduleItineraryService;
 
 
-
-    @GetMapping
-    public ResponseEntity<List<ScheduleDto>> listByGroupId(@PathVariable final Integer groupId){
-        return ResponseEntity.ok().body(scheduleItineraryService.listSchedulesItineraryByGroupId(groupId));
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ScheduleDto> getScheduleById(@PathVariable final Integer id){

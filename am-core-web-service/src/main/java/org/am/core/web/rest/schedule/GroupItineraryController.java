@@ -3,20 +3,17 @@ package org.am.core.web.rest.schedule;
 import lombok.RequiredArgsConstructor;
 import org.am.core.web.dto.schedule.GroupDto;
 import org.am.core.web.dto.schedule.GroupRequest;
-import org.am.core.web.dto.schedule.ScheduleDto;
-import org.am.core.web.dto.schedule.ScheduleRequest;
 import org.am.core.web.service.schedule.GroupItineraryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/areas/{areaId}/careers/{careerId}/itineraries/{itineraryId}/groups")
+@RequestMapping("/admin/areas/{areaId}/careers/{careerId}/itineraries/{itineraryId}/itinerary-groups")
 @RequiredArgsConstructor
-public class ItineraryGroupController {
+public class GroupItineraryController {
 
     private final GroupItineraryService groupItineraryService;
     @GetMapping

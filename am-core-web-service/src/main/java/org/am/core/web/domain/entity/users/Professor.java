@@ -1,4 +1,4 @@
-package org.am.core.web.domain.entity.schedule;
+package org.am.core.web.domain.entity.users;
 
 
 import jakarta.persistence.Entity;
@@ -23,9 +23,6 @@ public class Professor {
     private String lastName;
     @Column(name = "second_last_name")
     private String secondLastName;
-
-
-    private String fullName;
 
     public Professor(String name, String lastName, String secondLastName) {
         this.name = name;
