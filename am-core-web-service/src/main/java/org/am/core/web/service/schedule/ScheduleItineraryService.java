@@ -9,13 +9,14 @@ import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.ScheduleItineraryRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.am.core.web.util.CommonUtils.getFullName;
-
+import static org.am.core.web.util.UtilConstants.NOT_ASSIGNED_YET;
 
 
 @Service
@@ -43,9 +44,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
             scheduleItineraries.add(schedule);
         }
 
-        scheduleItineraryRepository.saveAll(scheduleItineraries);
-
-        return scheduleItineraries.stream()
+        return scheduleItineraryRepository.saveAll(scheduleItineraries).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
 
@@ -56,9 +55,9 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         ScheduleItinerary scheduleItineraryFromDB = scheduleItineraryRepository.findById(scheduleItineraryId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
 
-        scheduleItineraryFromDB.setDayOfWeek(scheduleDto.dayOfWeek());
-        scheduleItineraryFromDB.setStartTime(scheduleDto.start_time());
-        scheduleItineraryFromDB.setEndTime(scheduleDto.end_time());
+        scheduleItineraryFromDB.setDayOfWeek(scheduleDto.dayOfWeek().getValue());
+        scheduleItineraryFromDB.setStartTime(scheduleDto.startTime());
+        scheduleItineraryFromDB.setEndTime(scheduleDto.endTime());
 
         scheduleItineraryFromDB.setProfessor(buildProfessorById(scheduleDto.professorId()));
 
@@ -77,7 +76,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
 
     @Override
     public ScheduleDto toDto(ScheduleItinerary scheduleItinerary) {
-        String fullName = "";
+        String fullName = NOT_ASSIGNED_YET;
         if (scheduleItinerary.getProfessor() != null) {
             fullName = getFullName(scheduleItinerary.getProfessor().getName(),
                     scheduleItinerary.getProfessor().getLastName(),
@@ -88,7 +87,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
 
         return new ScheduleDto(
                 scheduleItinerary.getId(),
-                scheduleItinerary.getDayOfWeek(),
+                DayOfWeek.of(scheduleItinerary.getDayOfWeek()).toString(),
                 scheduleItinerary.getStartTime(),
                 scheduleItinerary.getEndTime(),
                 scheduleItinerary.getClassroom().getName(),
@@ -105,9 +104,9 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
     public ScheduleItinerary toEntity(ScheduleRequest scheduleRequest) {
         ScheduleItinerary scheduleItinerary = new ScheduleItinerary();
 
-        scheduleItinerary.setDayOfWeek(scheduleRequest.dayOfWeek());
-        scheduleItinerary.setStartTime(scheduleRequest.start_time());
-        scheduleItinerary.setEndTime(scheduleRequest.end_time());
+        scheduleItinerary.setDayOfWeek(scheduleRequest.dayOfWeek().getValue());
+        scheduleItinerary.setStartTime(scheduleRequest.startTime());
+        scheduleItinerary.setEndTime(scheduleRequest.endTime());
 
         scheduleItinerary.setProfessor(buildProfessorById(scheduleRequest.professorId()));
 

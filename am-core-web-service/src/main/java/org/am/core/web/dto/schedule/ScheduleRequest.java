@@ -4,8 +4,8 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 public record ScheduleRequest(DayOfWeek dayOfWeek,
-                              LocalTime start_time,
-                              LocalTime end_time,
+                              LocalTime startTime,
+                              LocalTime endTime,
                               Integer professorId,
                               String assistant,
                               Integer classroomId,

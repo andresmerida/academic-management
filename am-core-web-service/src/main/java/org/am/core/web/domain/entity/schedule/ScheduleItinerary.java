@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.am.core.web.domain.entity.admingeneral.Classroom;
 import org.am.core.web.domain.entity.users.Professor;
 
-import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Entity
@@ -29,7 +28,7 @@ public class ScheduleItinerary {
     private LocalTime endTime;
 
     @Column(name = "weekday")
-    private DayOfWeek dayOfWeek;
+    private Integer dayOfWeek;
 
     private String assistant;
 
@@ -45,9 +44,12 @@ public class ScheduleItinerary {
     @JoinColumn(name = "group_itinerary_id")
     private GroupItinerary groupItinerary;
 
-    public ScheduleItinerary(LocalTime startTime, LocalTime endTime,
-                             DayOfWeek dayOfWeek, String assistant,
-                             Classroom classroom, Professor professor,
+    public ScheduleItinerary(LocalTime startTime,
+                             LocalTime endTime,
+                             Integer dayOfWeek,
+                             String assistant,
+                             Classroom classroom,
+                             Professor professor,
                              GroupItinerary groupItinerary) {
         this.startTime = startTime;
         this.endTime = endTime;

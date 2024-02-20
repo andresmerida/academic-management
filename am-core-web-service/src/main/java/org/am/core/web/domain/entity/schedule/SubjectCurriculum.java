@@ -33,10 +33,6 @@ public class SubjectCurriculum {
     @JoinColumn(name = "subject_id")
     private Subject subject;
 
-
-
-
-
     public SubjectCurriculum(SubjectCurriculumId subjectCurriculumId, Short level, Boolean optional,
                              String path, Short workload, Boolean active) {
         this.subjectCurriculumId = subjectCurriculumId;
