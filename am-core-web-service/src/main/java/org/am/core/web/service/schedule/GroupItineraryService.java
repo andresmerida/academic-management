@@ -43,6 +43,7 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
                         auxDto.subjectName(),
                         auxDto.subjectInitials(),
                         auxDto.groupIdentifier(),
+                        auxDto.groupRemark(),
                         new ArrayList<>(scheduleDtoList)));
                 scheduleDtoList.clear();
             }
@@ -73,6 +74,7 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
                     previousGroupAuxDto.subjectName(),
                     previousGroupAuxDto.subjectInitials(),
                     previousGroupAuxDto.groupIdentifier(),
+                    previousGroupAuxDto.groupRemark(),
                     new ArrayList<>(scheduleDtoList)));
             scheduleDtoList = null;
         }
@@ -132,6 +134,7 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
                 groupItinerary.getSubjectCurriculum().getSubject().getName(),
                 groupItinerary.getSubjectCurriculum().getSubject().getInitials(),
                 groupItinerary.getIdentifier(),
+                groupItinerary.getRemark(),
                 scheduleDtos
         );
     }
