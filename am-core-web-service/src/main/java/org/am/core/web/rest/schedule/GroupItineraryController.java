@@ -7,6 +7,7 @@ import org.am.core.web.service.schedule.GroupItineraryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 
@@ -17,24 +18,32 @@ public class GroupItineraryController {
 
     private final GroupItineraryService groupItineraryService;
     @GetMapping
-    public ResponseEntity<List<GroupDto>> listItineraryGroups(@PathVariable final Integer areaId,
-                                                              @PathVariable final Integer careerId,
+    public ResponseEntity<List<GroupDto>> listItineraryGroupsByCareerAndItinerary(@PathVariable final Integer careerId,
                                                               @PathVariable final Integer itineraryId){
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity
+                .ok()
+                .body(groupItineraryService.getItineraryGroupsByCareerAndItinerary(careerId, itineraryId));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GroupDto> getScheduleById(@PathVariable final Integer id){
+    public ResponseEntity<GroupDto> getGroupItineraryById(@PathVariable final Integer id){
         return ResponseEntity
                 .ok()
                 .body(groupItineraryService.getItineraryById(id).orElseThrow(IllegalArgumentException::new));
     }
 
     @PostMapping
-    public ResponseEntity<GroupDto> create(@RequestBody final GroupRequest groupRequest) throws URISyntaxException {
+    public ResponseEntity<GroupDto> create(@PathVariable final Integer areaId,
+                                           @PathVariable final Integer careerId,
+                                           @PathVariable final Integer itineraryId,
+                                           @RequestBody final GroupRequest groupRequest) throws URISyntaxException {
         GroupDto groupDto = groupItineraryService.save(groupRequest);
 
-        return ResponseEntity.ok().body(groupDto);
+        return ResponseEntity.created(
+                new URI("/admin/areas/" + areaId + "/careers/" + careerId + "/itineraries/" + itineraryId +
+                        "/itinerary-groups/" + groupDto.id())
+                )
+                .body(groupDto);
     }
 
     @PutMapping("/{id}")
