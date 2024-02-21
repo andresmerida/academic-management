@@ -9,6 +9,7 @@ import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.ScheduleItineraryRepository;
 import org.springframework.stereotype.Service;
 
+
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
 
     private final ScheduleItineraryRepository scheduleItineraryRepository;
 
-    public Optional<ScheduleDto> getItineraryById(Integer id){
+    public Optional<ScheduleDto> getScheduleById(Integer id){
         return scheduleItineraryRepository.findById(id).map(this::toDto);
     }
 
@@ -74,6 +75,122 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         return toDto(scheduleItineraryRepository.save(scheduleItineraryFromDB));
     }
 
+
+
+    public List<ScheduleDto> editAll(List<ScheduleRequest> requests, Integer groupItineraryId, GroupItinerary savedGroup){
+
+        List<ScheduleItinerary> existing = scheduleItineraryRepository.findByGroupItineraryId(groupItineraryId);
+        List<ScheduleItinerary> scheduleItineraries = new ArrayList<>();
+
+        int requestIndex = 0;
+        int auxExisting = 0;
+
+        System.out.println();
+
+        if(existing.size() == requests.size()){
+            for (ScheduleItinerary schedule : existing) {
+                if (requestIndex < requests.size()) {
+                    ScheduleRequest auxRequest = requests.get(requestIndex);
+                    Integer scheduleId = schedule.getId();
+                    ScheduleItinerary scheduleItineraryFromDB = scheduleItineraryRepository.findById(scheduleId)
+                            .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+                    scheduleItineraryFromDB.setDayOfWeek(auxRequest.dayOfWeek().getValue());
+                    scheduleItineraryFromDB.setStartTime(auxRequest.startTime());
+                    scheduleItineraryFromDB.setEndTime(auxRequest.endTime());
+                    scheduleItineraryFromDB.setProfessor(buildProfessorById(auxRequest.professorId()));
+                    scheduleItineraryFromDB.setAssistant(auxRequest.assistant());
+                    Classroom classroom = new Classroom();
+                    classroom.setId(auxRequest.classroomId());
+                    scheduleItineraryFromDB.setClassroom(classroom);
+                    GroupItinerary groupItinerary = new GroupItinerary();
+                    groupItinerary.setId(groupItineraryId);
+                    scheduleItineraryFromDB.setGroupItinerary(groupItinerary);
+                    scheduleItineraryRepository.save(scheduleItineraryFromDB);
+                    requestIndex++;
+                } else {
+                    break;
+                }
+            }
+        }else{
+            if (existing.size() < requests.size()) {
+                for (ScheduleItinerary schedule : existing) {
+                    if (requestIndex < requests.size()) {
+                        ScheduleRequest auxRequest = requests.get(requestIndex);
+                        Integer scheduleId = schedule.getId();
+                        ScheduleItinerary scheduleItineraryFromDB = scheduleItineraryRepository.findById(scheduleId)
+                                .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+                        scheduleItineraryFromDB.setDayOfWeek(auxRequest.dayOfWeek().getValue());
+                        scheduleItineraryFromDB.setStartTime(auxRequest.startTime());
+                        scheduleItineraryFromDB.setEndTime(auxRequest.endTime());
+                        scheduleItineraryFromDB.setProfessor(buildProfessorById(auxRequest.professorId()));
+                        scheduleItineraryFromDB.setAssistant(auxRequest.assistant());
+                        Classroom classroom = new Classroom();
+                        classroom.setId(auxRequest.classroomId());
+                        scheduleItineraryFromDB.setClassroom(classroom);
+                        GroupItinerary groupItinerary = new GroupItinerary();
+                        groupItinerary.setId(groupItineraryId);
+                        scheduleItineraryFromDB.setGroupItinerary(groupItinerary);
+                        scheduleItineraryRepository.save(scheduleItineraryFromDB);
+                        requestIndex++;
+                        auxExisting++;
+                    }
+                }
+                List<ScheduleRequest> remainingRequests = requests.subList(requestIndex, requests.size());
+                for (ScheduleRequest remainingRequest : remainingRequests) {
+                        ScheduleItinerary schedule = toEntity(remainingRequest);
+                        schedule.setGroupItinerary(savedGroup);
+                        scheduleItineraryRepository.save(schedule);
+
+                }
+            }else {
+
+                if(existing.size() > requests.size()){
+                    for (ScheduleItinerary schedule : existing) {
+                        if (requestIndex < requests.size()) {
+                            ScheduleRequest auxRequest = requests.get(requestIndex);
+                            Integer scheduleId = schedule.getId();
+                            ScheduleItinerary scheduleItineraryFromDB = scheduleItineraryRepository.findById(scheduleId)
+                                    .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+                            scheduleItineraryFromDB.setDayOfWeek(auxRequest.dayOfWeek().getValue());
+                            scheduleItineraryFromDB.setStartTime(auxRequest.startTime());
+                            scheduleItineraryFromDB.setEndTime(auxRequest.endTime());
+                            scheduleItineraryFromDB.setProfessor(buildProfessorById(auxRequest.professorId()));
+                            scheduleItineraryFromDB.setAssistant(auxRequest.assistant());
+                            Classroom classroom = new Classroom();
+                            classroom.setId(auxRequest.classroomId());
+                            scheduleItineraryFromDB.setClassroom(classroom);
+                            GroupItinerary groupItinerary = new GroupItinerary();
+                            groupItinerary.setId(groupItineraryId);
+                            scheduleItineraryFromDB.setGroupItinerary(groupItinerary);
+                            scheduleItineraryRepository.save(scheduleItineraryFromDB);
+                            requestIndex++;
+                            auxExisting++;
+                        }
+                    }
+                    for (int i = requestIndex; i < existing.size(); i++) {
+                        ScheduleItinerary schedule = existing.get(i);
+                        scheduleItineraryRepository.delete(schedule);
+                    }
+                }
+            }
+
+        }
+
+
+        List<ScheduleItinerary> finalList = scheduleItineraryRepository.findByGroupItineraryId(groupItineraryId);
+        return finalList.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+
+
+    public void delete(Integer id) {
+        scheduleItineraryRepository.deleteById(id);
+    }
+    public void deleteAll( List<ScheduleItinerary> schedules) {
+        scheduleItineraryRepository.deleteAll(schedules);
+    }
     @Override
     public ScheduleDto toDto(ScheduleItinerary scheduleItinerary) {
         String fullName = NOT_ASSIGNED_YET;
@@ -132,5 +249,9 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         }
 
         return professor;
+    }
+
+    public List<ScheduleItinerary> findSchedleByGroupId(Integer groupId){
+        return scheduleItineraryRepository.findByGroupItineraryId(groupId);
     }
 }

@@ -41,7 +41,7 @@ public class GroupItineraryJdbcRepositoryImpl implements GroupItineraryJdbcRepos
                     inner join public.subject s on sc.subject_id = s.id
                     inner join public.curriculum cu on cu.id = g.curriculum_id
                 where cu.career_id = ? and g.itinerary_id = ? and sc.active = true
-                order by sc.level, s.name, g.identifier, si.weekday, si.start_time;
+                order by g.id, sc.level, s.name, g.identifier, si.weekday, si.start_time;
                 """)
                 .param(careerId)
                 .param(itineraryId)
