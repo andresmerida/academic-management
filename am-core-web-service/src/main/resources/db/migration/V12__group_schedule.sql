@@ -26,9 +26,9 @@ ALTER TABLE class_group ADD CONSTRAINT fk_class_group_ref_subject_curriculum
 -- Crear tabla schedule
 CREATE TABLE schedule (
                           id INTEGER NOT NULL ,
-                          start_time TIME NOT NULL,
-                          end_time TIME NOT NULL,
-                          weekday VARCHAR(10) NOT NULL,
+                          start_time TIME,
+                          end_time TIME,
+                          weekday SMALLINT,
                           assistant VARCHAR(100),
                           classroom_id INTEGER,
                           professor_id INTEGER,

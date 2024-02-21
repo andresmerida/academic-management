@@ -48,15 +48,17 @@ public class Schedule {
     @JoinColumn(name = "professor_id")
     private Professor professor;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
 
-    public Schedule (LocalTime startTime, LocalTime endTime,
-                     String weekday, String assistant,
-                     Classroom classroom, Professor professor,
-                     Group group){
+    public Schedule (LocalTime startTime,
+                     LocalTime endTime,
+                     String weekday,
+                     String assistant,
+                     Classroom classroom,
+                     Professor professor,
+                     Group group) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.weekday = weekday;
