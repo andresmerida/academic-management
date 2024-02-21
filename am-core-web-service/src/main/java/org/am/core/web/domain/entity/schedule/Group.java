@@ -45,29 +45,24 @@ public class Group {
     @JoinColumn(name = "itinerary_id")
     private Itinerary itinerary;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_period_id")
     private AcademicPeriod academicPeriod;
 
-
     @OneToMany(mappedBy="group", cascade = CascadeType.MERGE)
     private List<Schedule> schedules;
 
-
-    public Group (String identifier,
-                  String remark,
-                  boolean active,
-                  SubjectCurriculum subjectCurriculum,
-                  Itinerary itinerary,
-                  AcademicPeriod academicPeriod,
-                  List<Schedule> schedules){
+    public Group(String identifier,
+                 String remark,
+                 boolean active,
+                 SubjectCurriculum subjectCurriculum,
+                 Itinerary itinerary,
+                 AcademicPeriod academicPeriod) {
         this.identifier = identifier;
         this.remark = remark;
         this.active = active;
         this.subjectCurriculum = subjectCurriculum;
         this.itinerary = itinerary;
         this.academicPeriod =  academicPeriod;
-        this.schedules = schedules;
     }
 }

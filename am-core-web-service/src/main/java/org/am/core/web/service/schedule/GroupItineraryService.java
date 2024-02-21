@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.am.core.web.domain.entity.admingeneral.Subject;
 import org.am.core.web.domain.entity.schedule.*;
 import org.am.core.web.dto.schedule.GroupAuxDto;
+import org.am.core.web.dto.schedule.GroupDetailedAuxDto;
+import org.am.core.web.dto.schedule.GroupDetailedDto;
 import org.am.core.web.dto.schedule.GroupDto;
 import org.am.core.web.dto.schedule.GroupRequest;
+import org.am.core.web.dto.schedule.ScheduleDetailedDto;
 import org.am.core.web.dto.schedule.ScheduleDto;
 import org.am.core.web.repository.jdbc.schedule.GroupItineraryJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
@@ -38,11 +41,12 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
         for (GroupAuxDto auxDto: groupItineraryJdbcRepository.getGroupItinerariesByCareer(careerId, itineraryId)) {
             if (previousGroupAuxDto != null && previousGroupAuxDto.groupItineraryId().intValue() != auxDto.groupItineraryId().intValue()) {
                 groupDtoList.add(new GroupDto(
-                        auxDto.groupItineraryId(),
-                        auxDto.level(),
-                        auxDto.subjectName(),
-                        auxDto.subjectInitials(),
-                        auxDto.groupIdentifier(),
+                        previousGroupAuxDto.groupItineraryId(),
+                        previousGroupAuxDto.level(),
+                        previousGroupAuxDto.subjectName(),
+                        previousGroupAuxDto.subjectInitials(),
+                        previousGroupAuxDto.groupIdentifier(),
+                        previousGroupAuxDto.groupRemark(),
                         new ArrayList<>(scheduleDtoList)));
                 scheduleDtoList.clear();
             }
@@ -73,6 +77,55 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
                     previousGroupAuxDto.subjectName(),
                     previousGroupAuxDto.subjectInitials(),
                     previousGroupAuxDto.groupIdentifier(),
+                    previousGroupAuxDto.groupRemark(),
+                    new ArrayList<>(scheduleDtoList)));
+            scheduleDtoList = null;
+        }
+
+        return groupDtoList;
+    }
+
+    public List<GroupDetailedDto> getGroupsScheduleByCareerAndItinerary(Integer careerId, Integer itineraryId) {
+        List<GroupDetailedDto> groupDtoList = new ArrayList<>();
+        GroupDetailedAuxDto previousGroupDetailedAuxDto = null;
+        List<ScheduleDetailedDto> scheduleDtoList = new ArrayList<>();
+        for (GroupDetailedAuxDto detailedAuxDto: groupItineraryJdbcRepository.getGroupItinerariesDetailedByCareer(careerId, itineraryId)) {
+            if (previousGroupDetailedAuxDto != null && previousGroupDetailedAuxDto.groupItineraryId().intValue() != detailedAuxDto.groupItineraryId().intValue()) {
+                groupDtoList.add(new GroupDetailedDto(
+                        previousGroupDetailedAuxDto.groupItineraryId(),
+                        previousGroupDetailedAuxDto.groupIdentifier(),
+                        previousGroupDetailedAuxDto.groupRemark(),
+                        previousGroupDetailedAuxDto.curriculumId(),
+                        previousGroupDetailedAuxDto.subjectId(),
+                        itineraryId,
+                        previousGroupDetailedAuxDto.professorId(),
+                        previousGroupDetailedAuxDto.classroomId(),
+                        new ArrayList<>(scheduleDtoList)));
+                scheduleDtoList.clear();
+            }
+
+            scheduleDtoList.add(new ScheduleDetailedDto(
+                    detailedAuxDto.startTime(),
+                    detailedAuxDto.endTime(),
+                    DayOfWeek.of(detailedAuxDto.dayOfWeek()).toString(),
+                    detailedAuxDto.assistant(),
+                    detailedAuxDto.classroomId(),
+                    detailedAuxDto.professorId(),
+                    detailedAuxDto.groupItineraryId()
+            ));
+            previousGroupDetailedAuxDto = detailedAuxDto;
+        }
+
+        if (previousGroupDetailedAuxDto != null) {
+            groupDtoList.add(new GroupDetailedDto(
+                    previousGroupDetailedAuxDto.groupItineraryId(),
+                    previousGroupDetailedAuxDto.groupIdentifier(),
+                    previousGroupDetailedAuxDto.groupRemark(),
+                    previousGroupDetailedAuxDto.curriculumId(),
+                    previousGroupDetailedAuxDto.subjectId(),
+                    itineraryId,
+                    previousGroupDetailedAuxDto.professorId(),
+                    previousGroupDetailedAuxDto.classroomId(),
                     new ArrayList<>(scheduleDtoList)));
             scheduleDtoList = null;
         }
@@ -132,6 +185,7 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
                 groupItinerary.getSubjectCurriculum().getSubject().getName(),
                 groupItinerary.getSubjectCurriculum().getSubject().getInitials(),
                 groupItinerary.getIdentifier(),
+                groupItinerary.getRemark(),
                 scheduleDtos
         );
     }
