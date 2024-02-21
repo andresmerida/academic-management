@@ -24,7 +24,7 @@ public class ScheduleItineraryController {
     public ResponseEntity<ScheduleDto> getScheduleById(@PathVariable final Integer id){
         return ResponseEntity
                 .ok()
-                .body(scheduleItineraryService.getItineraryById(id).orElseThrow(IllegalArgumentException::new));
+                .body(scheduleItineraryService.getScheduleById(id).orElseThrow(IllegalArgumentException::new));
     }
 
     @PostMapping
@@ -39,6 +39,13 @@ public class ScheduleItineraryController {
         return ResponseEntity
                 .ok()
                 .body(scheduleItineraryService.edit(scheduleRequest, id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final Integer id){
+
+        scheduleItineraryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 
