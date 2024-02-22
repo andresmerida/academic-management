@@ -7,6 +7,7 @@ import org.am.core.web.dto.schedule.ItineraryDto;
 import org.am.core.web.dto.schedule.ItineraryRequest;
 import org.am.core.web.repository.jdbc.schedule.ItineraryJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
+import org.am.core.web.repository.jpa.admingeneral.CurriculumRepository;
 import org.am.core.web.repository.jpa.schedule.ItineraryRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
     private final ItineraryRepository itineraryRepository;
     private final ItineraryJdbcRepository itineraryJdbcRepository;
+    private final CurriculumRepository curriculumRepository;
 
     public ItineraryDto save(ItineraryRequest itineraryRequest){
         return toDto(itineraryRepository.save(toEntity(itineraryRequest)));
@@ -37,8 +39,8 @@ public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
 
         itineraryFromDB.setName(itineraryRequest.name());
 
-        Curriculum curriculum = new Curriculum();
-        curriculum.setId(itineraryRequest.curriculumId());
+        Curriculum curriculum=curriculumRepository.findById(itineraryRequest.curriculumId())
+                .orElseThrow(()->new IllegalArgumentException("Invalid id"));
 
         itineraryFromDB.setCurriculum(curriculum);
 
@@ -47,7 +49,7 @@ public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
 
     @Override
     public ItineraryDto toDto(Itinerary itinerary) {
-        itinerary.getCurriculum();
+
         return new ItineraryDto(
                 itinerary.getId(),
                 itinerary.getName(),
@@ -64,13 +66,12 @@ public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
     }
 
     public Itinerary toEntity(ItineraryRequest itineraryRequest) {
+        Curriculum curriculum=curriculumRepository.findById(itineraryRequest.curriculumId())
+                .orElseThrow(()->new IllegalArgumentException("Invalid id"));
+
         Itinerary itinerary = new Itinerary();
         itinerary.setName(itineraryRequest.name());
         itinerary.setActive(Boolean.TRUE);
-
-        Curriculum curriculum = new Curriculum();
-        curriculum.setId(itineraryRequest.curriculumId());
-
         itinerary.setCurriculum(curriculum);
         return itinerary;
     }
