@@ -122,6 +122,7 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
 
         scheduleItineraryService.editAll(groupDto.listSchedule(),savedGroup.getId(), savedGroup);
 
+
         return toDto(savedGroup);
     }
 

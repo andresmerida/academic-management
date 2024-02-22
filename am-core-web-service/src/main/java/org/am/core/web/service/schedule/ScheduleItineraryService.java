@@ -80,10 +80,8 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
     public List<ScheduleDto> editAll(List<ScheduleRequest> requests, Integer groupItineraryId, GroupItinerary savedGroup){
 
         List<ScheduleItinerary> existing = scheduleItineraryRepository.findByGroupItineraryId(groupItineraryId);
-        List<ScheduleItinerary> scheduleItineraries = new ArrayList<>();
 
         int requestIndex = 0;
-        int auxExisting = 0;
 
         System.out.println();
 
@@ -132,7 +130,6 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
                         scheduleItineraryFromDB.setGroupItinerary(groupItinerary);
                         scheduleItineraryRepository.save(scheduleItineraryFromDB);
                         requestIndex++;
-                        auxExisting++;
                     }
                 }
                 List<ScheduleRequest> remainingRequests = requests.subList(requestIndex, requests.size());
@@ -164,7 +161,6 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
                             scheduleItineraryFromDB.setGroupItinerary(groupItinerary);
                             scheduleItineraryRepository.save(scheduleItineraryFromDB);
                             requestIndex++;
-                            auxExisting++;
                         }
                     }
                     for (int i = requestIndex; i < existing.size(); i++) {
@@ -175,7 +171,6 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
             }
 
         }
-
 
         List<ScheduleItinerary> finalList = scheduleItineraryRepository.findByGroupItineraryId(groupItineraryId);
         return finalList.stream()
