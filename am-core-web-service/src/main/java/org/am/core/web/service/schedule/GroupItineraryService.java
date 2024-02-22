@@ -1,14 +1,12 @@
 package org.am.core.web.service.schedule;
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.domain.entity.admingeneral.Career;
 import org.am.core.web.domain.entity.admingeneral.Subject;
 import org.am.core.web.domain.entity.schedule.*;
 import org.am.core.web.dto.schedule.*;
 import org.am.core.web.repository.jdbc.schedule.GroupItineraryJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.GroupItineraryRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,7 +118,10 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
 
         GroupItinerary savedGroup = groupItineraryRepository.save(groupItineraryFromDB);
 
-        scheduleItineraryService.editAll(groupDto.listSchedule(),savedGroup.getId(), savedGroup);
+        List<ScheduleItinerary> schedules = scheduleItineraryService.findSchedleByGroupId(groupItineraryId);
+        scheduleItineraryService.deleteAll(schedules);
+
+        scheduleItineraryService.saveAll(groupDto.listSchedule(), savedGroup);
 
         return toDto(savedGroup);
     }
