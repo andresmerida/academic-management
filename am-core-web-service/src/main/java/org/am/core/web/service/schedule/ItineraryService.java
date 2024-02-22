@@ -1,7 +1,7 @@
 package org.am.core.web.service.schedule;
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.domain.entity.admingeneral.Career;
+import org.am.core.web.domain.entity.admingeneral.Curriculum;
 import org.am.core.web.domain.entity.schedule.Itinerary;
 import org.am.core.web.dto.schedule.ItineraryDto;
 import org.am.core.web.dto.schedule.ItineraryRequest;
@@ -31,22 +31,30 @@ public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
         return itineraryRepository.findById(id).map(this::toDto);
     }
 
-    public ItineraryDto edit(ItineraryRequest itineraryDto, Integer itineraryId){
+    public ItineraryDto edit(ItineraryRequest itineraryRequest, Integer itineraryId){
         Itinerary itineraryFromDB = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
-        itineraryFromDB.setName(itineraryDto.name());
+
+        itineraryFromDB.setName(itineraryRequest.name());
+
+        Curriculum curriculum = new Curriculum();
+        curriculum.setId(itineraryRequest.curriculumId());
+
+        itineraryFromDB.setCurriculum(curriculum);
 
         return toDto(itineraryRepository.save(itineraryFromDB));
     }
 
     @Override
     public ItineraryDto toDto(Itinerary itinerary) {
+        itinerary.getCurriculum();
         return new ItineraryDto(
                 itinerary.getId(),
                 itinerary.getName(),
-                itinerary.getCareer().getId(),
-                itinerary.getCareer().getName(),
-                itinerary.getCareer().getInitials()
+                itinerary.getCurriculum().getCareer().getId(),
+                itinerary.getCurriculum().getCareer().getName(),
+                itinerary.getCurriculum().getId(),
+                itinerary.getCurriculum().getName()
         );
     }
 
@@ -60,10 +68,10 @@ public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
         itinerary.setName(itineraryRequest.name());
         itinerary.setActive(Boolean.TRUE);
 
-        Career career = new Career();
-        career.setId(itineraryRequest.careerId());
+        Curriculum curriculum = new Curriculum();
+        curriculum.setId(itineraryRequest.curriculumId());
 
-        itinerary.setCareer(career);
+        itinerary.setCurriculum(curriculum);
         return itinerary;
     }
 
