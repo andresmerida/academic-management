@@ -6,6 +6,4 @@ import java.util.List;
 
 public interface ItineraryRepository extends JpaRepository<Itinerary, Integer> {
     List<Itinerary> findAllByActiveOrderByName(Boolean active);
-
-    List<Itinerary> findAllByActiveAndCareerIdOrderByName(Boolean active, Integer careerId);
 }

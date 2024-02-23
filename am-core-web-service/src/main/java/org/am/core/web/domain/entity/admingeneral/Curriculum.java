@@ -25,7 +25,7 @@ public class Curriculum {
     @Column(name = "min_approved_subjects")
     private Short minApprovedSubjeccts;
 
-    @Column(name = "star_date")
+    @Column(name = "start_date")
     private LocalDate starDate;
     @Column(name = "end_date")
     private LocalDate endDate;
