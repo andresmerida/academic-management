@@ -3,10 +3,7 @@ package org.am.core.web.service.schedule;
 import lombok.RequiredArgsConstructor;
 import org.am.core.web.domain.entity.admingeneral.Subject;
 import org.am.core.web.domain.entity.schedule.*;
-import org.am.core.web.dto.schedule.GroupAuxDto;
-import org.am.core.web.dto.schedule.GroupDto;
-import org.am.core.web.dto.schedule.GroupRequest;
-import org.am.core.web.dto.schedule.ScheduleDto;
+import org.am.core.web.dto.schedule.*;
 import org.am.core.web.repository.jdbc.schedule.GroupItineraryJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.GroupItineraryRepository;
@@ -38,11 +35,11 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
         for (GroupAuxDto auxDto: groupItineraryJdbcRepository.getGroupItinerariesByCareer(careerId, itineraryId)) {
             if (previousGroupAuxDto != null && previousGroupAuxDto.groupItineraryId().intValue() != auxDto.groupItineraryId().intValue()) {
                 groupDtoList.add(new GroupDto(
-                        auxDto.groupItineraryId(),
-                        auxDto.level(),
-                        auxDto.subjectName(),
-                        auxDto.subjectInitials(),
-                        auxDto.groupIdentifier(),
+                        previousGroupAuxDto.groupItineraryId(),
+                        previousGroupAuxDto.level(),
+                        previousGroupAuxDto.subjectName(),
+                        previousGroupAuxDto.subjectInitials(),
+                        previousGroupAuxDto.groupIdentifier(),
                         new ArrayList<>(scheduleDtoList)));
                 scheduleDtoList.clear();
             }
@@ -92,6 +89,8 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
         return toDto(savedGroup);
     }
 
+
+
     public GroupDto edit(GroupRequest groupDto, Integer groupItineraryId){
         GroupItinerary groupItineraryFromDB = groupItineraryRepository.findById(groupItineraryId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
@@ -100,20 +99,39 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
         itinerary.setId(groupDto.itineraryId());
         groupItineraryFromDB.setItinerary(itinerary);
 
-        groupItineraryFromDB.setIdentifier(groupDto.identifier());
-        groupItineraryFromDB.setRemark(groupDto.remark());
 
         SubjectCurriculumId subjectCurriculumId = new SubjectCurriculumId();
         subjectCurriculumId.setCurriculumId(groupDto.curriculumId());
         subjectCurriculumId.setSubjectId(groupDto.subjectId());
 
+        Subject subject = new Subject();
+        subject.setId(groupDto.subjectId());
+
         SubjectCurriculum subjectCurriculum = new SubjectCurriculum();
         subjectCurriculum.setSubjectCurriculumId(subjectCurriculumId);
-
+        subjectCurriculum.setSubject(subject);
         groupItineraryFromDB.setSubjectCurriculum(subjectCurriculum);
 
+        groupItineraryFromDB.setIdentifier(groupDto.identifier());
+        groupItineraryFromDB.setRemark(groupDto.remark());
 
-        return toDto(groupItineraryRepository.save(groupItineraryFromDB));
+
+        GroupItinerary savedGroup = groupItineraryRepository.save(groupItineraryFromDB);
+
+
+        List<ScheduleItinerary> schedules = scheduleItineraryService.findSchedleByGroupId(groupItineraryId);
+        scheduleItineraryService.deleteAll(schedules);
+
+        scheduleItineraryService.saveAll(groupDto.listSchedule(), savedGroup);
+
+
+        return toDto(savedGroup);
+    }
+
+    public void delete(Integer id) {
+            List<ScheduleItinerary> schedules = scheduleItineraryService.findSchedleByGroupId(id);
+            scheduleItineraryService.deleteAll(schedules);
+            groupItineraryRepository.deleteById(id);
     }
 
     @Override
