@@ -75,8 +75,6 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         return toDto(scheduleItineraryRepository.save(scheduleItineraryFromDB));
     }
 
-
-
     public void delete(Integer id) {
         scheduleItineraryRepository.deleteById(id);
     }

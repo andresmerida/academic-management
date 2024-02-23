@@ -118,10 +118,12 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
 
         GroupItinerary savedGroup = groupItineraryRepository.save(groupItineraryFromDB);
 
+
         List<ScheduleItinerary> schedules = scheduleItineraryService.findSchedleByGroupId(groupItineraryId);
         scheduleItineraryService.deleteAll(schedules);
 
         scheduleItineraryService.saveAll(groupDto.listSchedule(), savedGroup);
+
 
         return toDto(savedGroup);
     }
