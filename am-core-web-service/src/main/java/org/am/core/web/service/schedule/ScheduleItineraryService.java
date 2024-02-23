@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.am.core.web.util.CommonUtils.getFullName;
@@ -26,9 +25,6 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
 
     private final ScheduleItineraryRepository scheduleItineraryRepository;
 
-    public Optional<ScheduleDto> getScheduleById(Integer id){
-        return scheduleItineraryRepository.findById(id).map(this::toDto);
-    }
 
     public ScheduleDto save(ScheduleRequest scheduleRequest){
         return toDto(scheduleItineraryRepository.save(toEntity(scheduleRequest)));
@@ -145,3 +141,5 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         return scheduleItineraryRepository.findByGroupItineraryId(groupId);
     }
 }
+
+
