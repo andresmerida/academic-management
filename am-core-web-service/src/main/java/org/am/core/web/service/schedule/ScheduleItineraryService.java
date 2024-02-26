@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.am.core.web.util.CommonUtils.getFullName;
 import static org.am.core.web.util.UtilConstants.NOT_ASSIGNED_YET;
@@ -31,7 +30,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
     }
 
 
-    public List<ScheduleDto> saveAll(List<ScheduleRequest> scheduleRequestList, GroupItinerary savedGroup) {
+    public void saveAll(List<ScheduleRequest> scheduleRequestList, GroupItinerary savedGroup) {
 
         List<ScheduleItinerary> scheduleItineraries = new ArrayList<>();
 
@@ -41,11 +40,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
             scheduleItineraries.add(schedule);
         }
 
-        return scheduleItineraryRepository.saveAll(scheduleItineraries).stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-
-
+        scheduleItineraryRepository.saveAll(scheduleItineraries);
     }
 
     public ScheduleDto edit(ScheduleRequest scheduleDto, Integer scheduleItineraryId){
