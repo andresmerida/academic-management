@@ -4,6 +4,6 @@ public record SubjectCurriculumRequest(
         Integer subjectId,
         Boolean optional,
         String path,
-        Integer workload
+        Short workload
 ) {
 }
