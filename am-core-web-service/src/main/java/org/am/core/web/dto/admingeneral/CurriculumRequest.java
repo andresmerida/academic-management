@@ -5,7 +5,7 @@ import java.util.List;
 
 public record CurriculumRequest(
         String name,
-        Integer minApprovedSubjects,
+        Short minApprovedSubjects,
         LocalDate startDate,
         LocalDate endDate,
         Integer careerId,
