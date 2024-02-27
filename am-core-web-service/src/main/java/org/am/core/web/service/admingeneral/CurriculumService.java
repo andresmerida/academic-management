@@ -134,7 +134,6 @@ public class CurriculumService implements CustomMap<CurriculumDto, Curriculum> {
         }
         return savedCurriculum;
     }
-<<<<<<< HEAD
 
     private static SubjectCurriculum getSubjectCurriculum(LevelRequest levelRequest1, SubjectCurriculumRequest subjectCurriculumRequest, Curriculum savedCurriculum) {
         SubjectCurriculum subjectCurriculum = new SubjectCurriculum();
@@ -160,40 +159,6 @@ public class CurriculumService implements CustomMap<CurriculumDto, Curriculum> {
         return subjectCurriculum;
     }
 
-    private static SubjectCurriculum getSubjectCurriculumInstance(SubjectCurriculumRequest subjectCurriculumRequest,
-                                                                 LevelRequest levelRequest, Integer curriculumId) {
-        Curriculum curriculum = new Curriculum();
-        curriculum.setId(curriculumId);
-
-        Subject subject = new Subject();
-        subject.setId(subjectCurriculumRequest.subjectId());
-        return new SubjectCurriculum(
-                null,
-=======
-
-    private static SubjectCurriculum getSubjectCurriculum(LevelRequest levelRequest1, SubjectCurriculumRequest subjectCurriculumRequest, Curriculum savedCurriculum) {
-        SubjectCurriculum subjectCurriculum = new SubjectCurriculum();
-
-        Subject subject = new Subject();
-        subject.setId(subjectCurriculumRequest.subjectId());
-        subjectCurriculum.setSubject(subject);
-
-        SubjectCurriculumId subjectCurriculumId = new SubjectCurriculumId(
-                savedCurriculum.getId(),
-                subject.getId()
-
-        );
-        subjectCurriculum.setSubjectCurriculumId(subjectCurriculumId);
-        subjectCurriculum.setLevelName(levelRequest1.levelName());
-        subjectCurriculum.setLevel(levelRequest1.levelIdentifier());
-        subjectCurriculum.setPath(subjectCurriculumRequest.path());
-        subjectCurriculum.setWorkload(subjectCurriculumRequest.workload());
-        subjectCurriculum.setOptional(subjectCurriculumRequest.optional());
-        subjectCurriculum.setActive(Boolean.TRUE);
-        subjectCurriculum.setCurriculum(savedCurriculum);
-
-        return subjectCurriculum;
-    }
 
     private static SubjectCurriculum getSubjectCurriculumInstance(SubjectCurriculumRequest subjectCurriculumRequest,
                                                                  LevelRequest levelRequest, Integer curriculumId) {
@@ -210,7 +175,6 @@ public class CurriculumService implements CustomMap<CurriculumDto, Curriculum> {
         );
         return new SubjectCurriculum(
                 subjectCurriculumId,
->>>>>>> 1bdf8b3e9afe938519ceccccfae09c97232d4c16
                 levelRequest.levelIdentifier(),
                 subjectCurriculumRequest.optional(),
                 subjectCurriculumRequest.path(),
