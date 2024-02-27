@@ -1,6 +1,5 @@
 package org.am.core.web.domain.entity.admingeneral;
 
-
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,6 +29,7 @@ public class Curriculum {
 
     @Column(name = "start_date")
     private LocalDate starDate;
+
     @Column(name = "end_date")
     private LocalDate endDate;
 
@@ -41,7 +41,6 @@ public class Curriculum {
 
     @OneToMany(mappedBy="curriculum", cascade = CascadeType.ALL)
     private Set<SubjectCurriculum> levelRequests = new HashSet<>();
-
 
     public Curriculum(String name,
                       Short minApprovedSubjeccts,

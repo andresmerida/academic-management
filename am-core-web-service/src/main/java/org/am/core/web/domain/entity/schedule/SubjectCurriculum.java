@@ -17,10 +17,15 @@ public class SubjectCurriculum {
 
     @EmbeddedId
     private SubjectCurriculumId subjectCurriculumId;
+
     private Short level;
+
     private Boolean optional;
+
     private String path;
+
     private Short workload;
+
     private Boolean active;
 
     @Column(name = "level_name")

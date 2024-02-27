@@ -13,6 +13,7 @@ import org.am.core.web.dto.admingeneral.SubjectCurriculumRequest;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.admingeneral.CurriculumRepository;
 import org.am.core.web.repository.jpa.schedule.GroupItineraryRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,19 +40,22 @@ public class CurriculumService implements CustomMap<CurriculumDto, Curriculum> {
         return toDto(curriculumRepository.save(this.toEntity(curriculumRequest)));
     }
 
-    @Transactional
     public void delete(Integer id) {
-            Curriculum curriculum = curriculumRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
+        curriculumRepository.deleteById(id);
 
-            curriculum.setActive(Boolean.FALSE);
+    }
 
-            Set<SubjectCurriculum> subjectCurriculums = curriculum.getLevelRequests();
-            for (SubjectCurriculum subjectCurriculum : subjectCurriculums) {
-                subjectCurriculum.setActive(false);
-            }
-            curriculumRepository.save(curriculum);
+    public void logicalDelete(Integer id){
+        Curriculum curriculum = curriculumRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
 
+        curriculum.setActive(Boolean.FALSE);
+
+        Set<SubjectCurriculum> subjectCurriculums = curriculum.getLevelRequests();
+        for (SubjectCurriculum subjectCurriculum : subjectCurriculums) {
+            subjectCurriculum.setActive(false);
+        }
+        curriculumRepository.save(curriculum);
     }
 
     @Override
