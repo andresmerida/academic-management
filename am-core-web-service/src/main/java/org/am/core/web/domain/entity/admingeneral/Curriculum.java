@@ -40,7 +40,7 @@ public class Curriculum {
     private Career career;
 
     @OneToMany(mappedBy="curriculum", cascade = CascadeType.ALL)
-    private Set<SubjectCurriculum> levelRequests = new HashSet<>();
+    private Set<SubjectCurriculum> subjectCurriculumSet = new HashSet<>();
 
     public Curriculum(String name,
                       Short minApprovedSubjeccts,
@@ -55,6 +55,6 @@ public class Curriculum {
         this.endDate = endDate;
         this.active = active;
         this.career = career;
-        this.levelRequests = levelRequests;
+        this.subjectCurriculumSet = levelRequests;
     }
 }

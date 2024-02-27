@@ -22,5 +22,4 @@ public class SubjectCurriculumId implements Serializable {
         this.curriculumId = curriculumId;
         this.subjectId = subjectId;
     }
-
 }

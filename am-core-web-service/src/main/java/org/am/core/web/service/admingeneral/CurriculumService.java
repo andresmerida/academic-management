@@ -1,24 +1,23 @@
 package org.am.core.web.service.admingeneral;
 
-
 import lombok.RequiredArgsConstructor;
 import org.am.core.web.domain.entity.admingeneral.Career;
 import org.am.core.web.domain.entity.admingeneral.Curriculum;
 import org.am.core.web.domain.entity.admingeneral.Subject;
 import org.am.core.web.domain.entity.schedule.*;
+import org.am.core.web.dto.admingeneral.CurriculumDetailedDto;
 import org.am.core.web.dto.admingeneral.CurriculumDto;
 import org.am.core.web.dto.admingeneral.CurriculumRequest;
 import org.am.core.web.dto.admingeneral.LevelRequest;
 import org.am.core.web.dto.admingeneral.SubjectCurriculumRequest;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.admingeneral.CurriculumRepository;
-import org.am.core.web.repository.jpa.schedule.GroupItineraryRepository;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -26,7 +25,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class CurriculumService implements CustomMap<CurriculumDto, Curriculum> {
     private final CurriculumRepository curriculumRepository;
-    private final GroupItineraryRepository groupItineraryRepository;
 
     @Transactional(readOnly = true)
     public List<CurriculumDto> getCurriculumsByCareerId(Integer careerId) {
@@ -40,6 +38,44 @@ public class CurriculumService implements CustomMap<CurriculumDto, Curriculum> {
         return toDto(curriculumRepository.save(this.toEntity(curriculumRequest)));
     }
 
+    public CurriculumDto edit(CurriculumDetailedDto dto) {
+        Curriculum curriculumFromDb = curriculumRepository.findById(dto.curriculumId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid id for curriculumId"));
+        curriculumFromDb.setName(dto.name());
+        curriculumFromDb.setMinApprovedSubjeccts(dto.minApprovedSubjects());
+        curriculumFromDb.setStarDate(dto.startDate());
+        curriculumFromDb.setEndDate(dto.endDate());
+
+        Set<SubjectCurriculum> newSubjectCurriculumSet = new HashSet<>();
+        Set<SubjectCurriculum> subjectCurriculumSet = curriculumFromDb.getSubjectCurriculumSet();
+
+        for (LevelRequest levelRequest : dto.levelList()) {
+            for (SubjectCurriculumRequest subjectCurriculumRequest : levelRequest.subjectCurriculumList()) {
+
+                Optional<SubjectCurriculum> subjectCurriculumOptional = subjectCurriculumSet
+                        .stream()
+                        .filter(obj -> obj.getSubjectCurriculumId().equals(new SubjectCurriculumId(dto.curriculumId(), subjectCurriculumRequest.subjectId())))
+                        .findFirst();
+                if (subjectCurriculumOptional.isPresent()) {
+                    SubjectCurriculum subjectCurriculum = subjectCurriculumOptional.get();
+                    subjectCurriculum.setOptional(subjectCurriculumRequest.optional());
+                    subjectCurriculum.setPath(subjectCurriculumRequest.path());
+                    subjectCurriculum.setWorkload(subjectCurriculumRequest.workload());
+
+                    newSubjectCurriculumSet.add(subjectCurriculum);
+                } else {
+                    newSubjectCurriculumSet.add(getSubjectCurriculumInstance(subjectCurriculumRequest,
+                            levelRequest, dto.curriculumId()));
+                }
+
+            }
+        }
+
+        curriculumFromDb.setSubjectCurriculumSet(newSubjectCurriculumSet);
+
+        return toDto(curriculumRepository.save(curriculumFromDb));
+    }
+
     public void delete(Integer id) {
         curriculumRepository.deleteById(id);
 
@@ -51,8 +87,7 @@ public class CurriculumService implements CustomMap<CurriculumDto, Curriculum> {
 
         curriculum.setActive(Boolean.FALSE);
 
-        Set<SubjectCurriculum> subjectCurriculums = curriculum.getLevelRequests();
-        for (SubjectCurriculum subjectCurriculum : subjectCurriculums) {
+        for (SubjectCurriculum subjectCurriculum : curriculum.getSubjectCurriculumSet()) {
             subjectCurriculum.setActive(false);
         }
         curriculumRepository.save(curriculum);
@@ -90,36 +125,56 @@ public class CurriculumService implements CustomMap<CurriculumDto, Curriculum> {
 
         Curriculum savedCurriculum = curriculumRepository.save(curriculum);
 
-        List<LevelRequest> levelRequests = curriculumRequest.levelList();
-
-        for (LevelRequest levelRequest1 : levelRequests) {
-            for (SubjectCurriculumRequest subjectCurriculumRequest : levelRequest1.subjectCurriculumList()) {
-                SubjectCurriculum subjectCurriculum = new SubjectCurriculum();
-
-                Subject subject = new Subject();
-                subject.setId(subjectCurriculumRequest.subjectId());
-                subjectCurriculum.setSubject(subject);
-
-                SubjectCurriculumId subjectCurriculumId = new SubjectCurriculumId(
-                        savedCurriculum.getId(),
-                        subject.getId()
-
-                );
-                subjectCurriculum.setSubjectCurriculumId(subjectCurriculumId);
-                subjectCurriculum.setLevelName(levelRequest1.levelName());
-                subjectCurriculum.setLevel(levelRequest1.levelIdentifier());
-                subjectCurriculum.setPath(subjectCurriculumRequest.path());
-                subjectCurriculum.setWorkload(subjectCurriculumRequest.workload());
-                subjectCurriculum.setOptional(subjectCurriculumRequest.optional());
-                subjectCurriculum.setActive(Boolean.TRUE);
-                subjectCurriculum.setCurriculum(savedCurriculum);
-
-                if (savedCurriculum.getLevelRequests() == null) {
-                    savedCurriculum.setLevelRequests(new HashSet<>());
-                }
-                savedCurriculum.getLevelRequests().add(subjectCurriculum);
+        for (LevelRequest levelRequest : curriculumRequest.levelList()) {
+            for (SubjectCurriculumRequest subjectCurriculumRequest : levelRequest.subjectCurriculumList()) {
+                SubjectCurriculum subjectCurriculum = getSubjectCurriculum(levelRequest, subjectCurriculumRequest, savedCurriculum);
+                savedCurriculum.getSubjectCurriculumSet().add(subjectCurriculum);
             }
         }
         return savedCurriculum;
+    }
+
+    private static SubjectCurriculum getSubjectCurriculum(LevelRequest levelRequest1, SubjectCurriculumRequest subjectCurriculumRequest, Curriculum savedCurriculum) {
+        SubjectCurriculum subjectCurriculum = new SubjectCurriculum();
+
+        Subject subject = new Subject();
+        subject.setId(subjectCurriculumRequest.subjectId());
+        subjectCurriculum.setSubject(subject);
+
+        SubjectCurriculumId subjectCurriculumId = new SubjectCurriculumId(
+                savedCurriculum.getId(),
+                subject.getId()
+
+        );
+        subjectCurriculum.setSubjectCurriculumId(subjectCurriculumId);
+        subjectCurriculum.setLevelName(levelRequest1.levelName());
+        subjectCurriculum.setLevel(levelRequest1.levelIdentifier());
+        subjectCurriculum.setPath(subjectCurriculumRequest.path());
+        subjectCurriculum.setWorkload(subjectCurriculumRequest.workload());
+        subjectCurriculum.setOptional(subjectCurriculumRequest.optional());
+        subjectCurriculum.setActive(Boolean.TRUE);
+        subjectCurriculum.setCurriculum(savedCurriculum);
+
+        return subjectCurriculum;
+    }
+
+    private static SubjectCurriculum getSubjectCurriculumInstance(SubjectCurriculumRequest subjectCurriculumRequest,
+                                                                 LevelRequest levelRequest, Integer curriculumId) {
+        Curriculum curriculum = new Curriculum();
+        curriculum.setId(curriculumId);
+
+        Subject subject = new Subject();
+        subject.setId(subjectCurriculumRequest.subjectId());
+        return new SubjectCurriculum(
+                null,
+                levelRequest.levelIdentifier(),
+                subjectCurriculumRequest.optional(),
+                subjectCurriculumRequest.path(),
+                subjectCurriculumRequest.workload(),
+                Boolean.TRUE,
+                levelRequest.levelName(),
+                curriculum,
+                subject
+        );
     }
 }

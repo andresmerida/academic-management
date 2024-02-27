@@ -42,7 +42,8 @@ public class SubjectCurriculum {
     private Subject subject;
 
     public SubjectCurriculum(SubjectCurriculumId subjectCurriculumId, Short level, Boolean optional,
-                             String path, Short workload, Boolean active, String levelName) {
+                             String path, Short workload, Boolean active, String levelName,
+                             Curriculum curriculum, Subject subject) {
         this.subjectCurriculumId = subjectCurriculumId;
         this.level = level;
         this.optional = optional;
@@ -50,6 +51,8 @@ public class SubjectCurriculum {
         this.workload = workload;
         this.active = active;
         this.levelName = levelName;
+        this.curriculum = curriculum;
+        this.subject = subject;
     }
 
 }
