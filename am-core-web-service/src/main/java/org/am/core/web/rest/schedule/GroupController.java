@@ -1,6 +1,9 @@
 package org.am.core.web.rest.schedule;
 
 import lombok.RequiredArgsConstructor;
+import org.am.core.web.domain.entity.schedule.Group;
+import org.am.core.web.dto.admingeneral.CurriculumDetailedDto;
+import org.am.core.web.dto.admingeneral.CurriculumDto;
 import org.am.core.web.dto.schedule.GroupDto;
 import org.am.core.web.dto.schedule.GroupRequest;
 import org.am.core.web.service.schedule.GroupService;
@@ -10,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/admin/areas/{areaId}/careers/{careerId}/academic-periods/{academicPeriodId}/groups")
@@ -23,6 +27,15 @@ public class GroupController {
                                                @RequestParam final Integer itineraryId) {
         groupService.generateGroupsFromItinerary(careerId, itineraryId, academicPeriodId);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{groupId}/{scheduleId}")
+    public ResponseEntity <Group> EditGroup(@PathVariable("groupId") Integer groupId,
+                                            @PathVariable("scheduleId") Integer scheduleId) throws URISyntaxException {
+
+        return ResponseEntity
+                .ok()
+                .body(groupService.deleteScheduleById(groupId, scheduleId));
     }
 
     @PostMapping
@@ -44,6 +57,16 @@ public class GroupController {
         return ResponseEntity
                 .ok()
                 .body(groupService.listGroupsByCareerAndAcademicPeriod(careerId, academicPeriodId));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<GroupDto> edit(@RequestBody final GroupRequest dto,
+                                         @PathVariable final Integer academicPeriodId,
+                                              @PathVariable final Integer id) {
+
+        return ResponseEntity
+                .ok()
+                .body(groupService.edit(dto, id, academicPeriodId));
     }
 
     @DeleteMapping("/{id}")

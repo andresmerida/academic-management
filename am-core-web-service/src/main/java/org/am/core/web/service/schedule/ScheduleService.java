@@ -8,6 +8,7 @@ import org.am.core.web.domain.entity.users.Professor;
 import org.am.core.web.dto.schedule.ScheduleDetailedDto;
 import org.am.core.web.dto.schedule.ScheduleDto;
 import org.am.core.web.repository.jpa.CustomMap;
+import org.am.core.web.repository.jpa.schedule.ScheduleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,12 @@ import static org.am.core.web.util.UtilConstants.NOT_ASSIGNED_YET;
 @Transactional
 @RequiredArgsConstructor
 public class ScheduleService implements CustomMap<ScheduleDto, Schedule> {
+
+    private final ScheduleRepository scheduleRepository;
+    public void delete(Integer id) {
+        scheduleRepository.deleteById(id);
+
+    }
 
     @Override
     public ScheduleDto toDto(Schedule schedule) {
