@@ -2,13 +2,14 @@ package org.am.core.web.rest.schedule;
 
 import lombok.RequiredArgsConstructor;
 import org.am.core.web.dto.schedule.GroupDto;
+import org.am.core.web.dto.schedule.GroupRequest;
 import org.am.core.web.service.schedule.GroupService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/areas/{areaId}/careers/{careerId}/academic-periods/{academicPeriodId}/groups")
@@ -21,6 +22,33 @@ public class GroupController {
                                                @PathVariable final Integer academicPeriodId,
                                                @RequestParam final Integer itineraryId) {
         groupService.generateGroupsFromItinerary(careerId, itineraryId, academicPeriodId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
+    public ResponseEntity<GroupDto> create(@RequestBody final GroupRequest groupRequest,
+                                           @PathVariable final Integer areaId,
+                                           @PathVariable final Integer careerId,
+                                           @PathVariable final Integer academicPeriodId
+                                           ) throws URISyntaxException {
+         GroupDto groupFromDB  = groupService.save(groupRequest, academicPeriodId);
+         return ResponseEntity.created(new URI("/admin/areas/"
+                 + areaId + "/careers/" + careerId + "/academic-periods/"
+                 + academicPeriodId + groupFromDB.id())).body(groupFromDB);
+
+    }
+
+    @GetMapping
+    public ResponseEntity<List<GroupDto>> listGroupsByCareerAndAcademicPeriod(@PathVariable final Integer careerId,
+                                                                                  @PathVariable final Integer academicPeriodId){
+        return ResponseEntity
+                .ok()
+                .body(groupService.listGroupsByCareerAndAcademicPeriod(careerId, academicPeriodId));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final Integer id) {
+            groupService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
