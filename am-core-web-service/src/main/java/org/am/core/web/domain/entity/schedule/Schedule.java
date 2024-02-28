@@ -36,7 +36,7 @@ public class Schedule {
     private LocalTime endTime;
 
     @Column(name = "weekday")
-    private String weekday;
+    private Integer weekday;
 
     private String assistant;
 
@@ -54,7 +54,7 @@ public class Schedule {
 
     public Schedule (LocalTime startTime,
                      LocalTime endTime,
-                     String weekday,
+                     Integer weekday,
                      String assistant,
                      Classroom classroom,
                      Professor professor,

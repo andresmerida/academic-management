@@ -1,28 +1,25 @@
 package org.am.core.web.service.schedule;
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.domain.entity.admingeneral.AcademicPeriod;
-import org.am.core.web.domain.entity.admingeneral.Classroom;
+import org.am.core.web.domain.entity.admingeneral.*;
 import org.am.core.web.domain.entity.schedule.Group;
 import org.am.core.web.domain.entity.schedule.Itinerary;
 import org.am.core.web.domain.entity.schedule.Schedule;
 import org.am.core.web.domain.entity.schedule.SubjectCurriculum;
 import org.am.core.web.domain.entity.schedule.SubjectCurriculumId;
 import org.am.core.web.domain.entity.users.Professor;
-import org.am.core.web.dto.schedule.GroupDetailedAuxDto;
-import org.am.core.web.dto.schedule.GroupDetailedDto;
-import org.am.core.web.dto.schedule.GroupDto;
-import org.am.core.web.dto.schedule.ScheduleDetailedDto;
+import org.am.core.web.dto.schedule.*;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.GroupRepository;
-import org.am.core.web.repository.jpa.schedule.ScheduleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.am.core.web.dto.schedule.BulkCreateGroupRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -30,39 +27,39 @@ import java.util.List;
 public class GroupService implements CustomMap <GroupDto, Group> {
 
     private final GroupRepository groupRepository;
-    private final ScheduleRepository scheduleRepository;
-
+    private final ScheduleService scheduleService;
     private GroupItineraryService groupItineraryService;
 
-
-    public void generateGroupsFromItinerary(BulkCreateGroupRequest dto) {
-
-        int count = 0;
-        int size = 100;
-        List<Schedule> listSchedule = new ArrayList<>();
-        List<GroupDetailedDto> groupDetailedAuxDtoList = groupItineraryService.getGroupsScheduleByCareerAndItinerary(dto.careerId(),dto.itineraryId());
+   public void generateGroupsFromItinerary(Integer careerId, Integer itineraryId,Integer academicPeriodId) {
+        List<GroupDetailedDto> groupDetailedAuxDtoList = groupItineraryService.getGroupsScheduleByCareerAndItinerary(careerId, itineraryId);
         for(GroupDetailedDto groupDetailedDto: groupDetailedAuxDtoList){
-            Group group =groupRepository.save(toEntity(groupDetailedDto, dto.academicPeriodId()));
-            for(ScheduleDetailedDto scheduleDetailedDto: groupDetailedDto.listScheduleDto()){
-                listSchedule.add(toEntity(scheduleDetailedDto, group.getId()));
-                if(count==size){
-                    saveBatch(listSchedule);
-                    count = 0;
-                }
-                count++;
-            }
-
+            groupRepository.save(toEntity(groupDetailedDto, academicPeriodId));
         }
 
     }
 
-    private void saveBatch(List<Schedule> batchSchedules) {
-        scheduleRepository.saveAll(batchSchedules);
-    }
-
     @Override
     public GroupDto toDto(Group group) {
-        return null;
+        List<ScheduleDto> scheduleDtos = new ArrayList<>();
+        if (group.getScheduleSetList() != null) {
+            scheduleDtos = group.getScheduleSetList()
+                    .stream()
+                    .map(scheduleService::toDto)
+                    .collect(Collectors.toList());
+        }
+
+        Subject subject = new Subject();
+        subject.setId(group.getSubjectCurriculum().getSubjectCurriculumId().getSubjectId());
+
+        return new GroupDto(
+                group.getId(),
+                group.getSubjectCurriculum().getLevel(),
+                subject.getName(),
+                subject.getInitials(),
+                group.getIdentifier(),
+                group.getRemark(),
+                scheduleDtos
+        );
     }
 
     @Override
@@ -70,27 +67,8 @@ public class GroupService implements CustomMap <GroupDto, Group> {
         return null;
     }
 
-    private Schedule toEntity(ScheduleDetailedDto dto, Integer groupId){
-        Schedule schedule = new Schedule();
-        schedule.setStartTime(dto.startTime());
-        schedule.setEndTime(dto.endTime());
-        schedule.setWeekday(dto.dayOfWeek());
-        schedule.setAssistant(dto.assistant());
+    public Group toEntity(GroupDetailedDto groupDetailedDto, Integer academicPeriodId) {
 
-        Classroom classroom = new Classroom();
-        classroom.setId(dto.classroomId());
-        schedule.setClassroom(classroom);
-
-        Professor professor = new Professor();
-        professor.setId(dto.professorId());
-        schedule.setProfessor(professor);
-
-        Group group = new Group();
-        group.setId(groupId);
-        schedule.setGroup(group);
-        return schedule;
-    }
-    private Group toEntity(GroupDetailedDto groupDetailedDto, Integer academicPeriodId) {
         Group group = new Group();
         group.setIdentifier(groupDetailedDto.groupIdentifier());
         group.setRemark(groupDetailedDto.remark());
@@ -98,8 +76,8 @@ public class GroupService implements CustomMap <GroupDto, Group> {
 
         SubjectCurriculum subjectCurriculum = new SubjectCurriculum();
         SubjectCurriculumId subjectCurriculumId = new SubjectCurriculumId(
-                                                                          groupDetailedDto.curriculumId(),
-                                                                          groupDetailedDto.SubjectId());
+                groupDetailedDto.curriculumId(),
+                groupDetailedDto.SubjectId());
         subjectCurriculum.setSubjectCurriculumId(subjectCurriculumId);
 
         Itinerary itinerary = new Itinerary();
@@ -110,7 +88,38 @@ public class GroupService implements CustomMap <GroupDto, Group> {
         group.setSubjectCurriculum(subjectCurriculum);
         group.setItinerary(itinerary);
         group.setAcademicPeriod(academicPeriod);
+
+        Set<Schedule> scheduleSet = new HashSet<>();
+        for (ScheduleDetailedDto scheduleDetailedDtoList : groupDetailedDto.listScheduleDto()) {
+            Schedule schedule = new Schedule();
+            schedule.setStartTime(scheduleDetailedDtoList.startTime());
+            schedule.setEndTime(scheduleDetailedDtoList.endTime());
+            schedule.setWeekday(scheduleDetailedDtoList.dayOfWeek().getValue());
+            schedule.setAssistant(scheduleDetailedDtoList.assistant());
+
+            Classroom classroom = new Classroom();
+            classroom.setId(scheduleDetailedDtoList.classroomId());
+            schedule.setClassroom(classroom);
+
+            schedule.setProfessor(buildProfessorById(scheduleDetailedDtoList.professorId()));
+            schedule.setGroup(group);
+
+            scheduleSet.add(schedule);
+        }
+        group.setScheduleSetList(scheduleSet);
+
         return group;
+    }
+
+    private Professor buildProfessorById(Integer professorId) {
+        Professor professor = new Professor();
+        if (professorId != null) {
+            professor.setId(professorId);
+        } else {
+            professor = null;
+        }
+
+        return professor;
     }
 
     @Autowired

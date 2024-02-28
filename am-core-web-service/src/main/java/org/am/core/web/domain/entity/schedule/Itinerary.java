@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.am.core.web.domain.entity.admingeneral.Career;
+import org.am.core.web.domain.entity.admingeneral.Curriculum;
 
 @Entity
 @Getter
@@ -23,13 +24,13 @@ public class Itinerary {
     private Boolean active;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "career_id")
-    private Career career;
+    @JoinColumn(name = "curriculum_id")
+    private Curriculum curriculum;
 
-    public Itinerary(String name, boolean active, Career career) {
+    public Itinerary(String name, boolean active, Curriculum curriculum) {
         this.name = name;
         this.active = active;
-        this.career = career;
+        this.curriculum = curriculum;
     }
 
 }

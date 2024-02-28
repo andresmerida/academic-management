@@ -20,9 +20,11 @@ public class ItineraryJdbcRepositoryImpl implements ItineraryJdbcRepository {
                     i.name,
                     c.id as careerId,
                     c.name as careerName,
-                    c.initials as careerInitials
+                    cu.id as curriculumId,
+                    cu.name as curriculumName
                 from itinerary i
-                inner join career c on i.career_id = c.id
+                inner join curriculum cu on i.curriculum_id = cu.id
+                inner join career c on cu.career_id = c.id
                 where c.area_id= ? and i.active=true
                 order by c.name, i.name
                 """)

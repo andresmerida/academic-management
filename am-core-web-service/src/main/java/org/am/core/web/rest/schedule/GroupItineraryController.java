@@ -1,7 +1,6 @@
 package org.am.core.web.rest.schedule;
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.dto.schedule.GroupDetailedDto;
 import org.am.core.web.dto.schedule.GroupDto;
 import org.am.core.web.dto.schedule.GroupRequest;
 import org.am.core.web.service.schedule.GroupItineraryService;
@@ -24,14 +23,6 @@ public class GroupItineraryController {
         return ResponseEntity
                 .ok()
                 .body(groupItineraryService.getItineraryGroupsByCareerAndItinerary(careerId, itineraryId));
-    }
-
-    @GetMapping("/pruebas")
-    public ResponseEntity<List<GroupDetailedDto>> listIGroupsScheduleByCareerAndItinerary(@PathVariable final Integer careerId,
-                                                                                          @PathVariable final Integer itineraryId){
-        return ResponseEntity
-                .ok()
-                .body(groupItineraryService.getGroupsScheduleByCareerAndItinerary(careerId, itineraryId));
     }
 
     @GetMapping("/{id}")
@@ -60,5 +51,11 @@ public class GroupItineraryController {
         return ResponseEntity
                 .ok()
                 .body(groupItineraryService.edit(groupRequest, id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final Integer id){
+        groupItineraryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
