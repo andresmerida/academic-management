@@ -17,11 +17,19 @@ public class SubjectCurriculum {
 
     @EmbeddedId
     private SubjectCurriculumId subjectCurriculumId;
+
     private Short level;
+
     private Boolean optional;
+
     private String path;
+
     private Short workload;
+
     private Boolean active;
+
+    @Column(name = "level_name")
+    private String levelName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("curriculumId")
@@ -34,13 +42,17 @@ public class SubjectCurriculum {
     private Subject subject;
 
     public SubjectCurriculum(SubjectCurriculumId subjectCurriculumId, Short level, Boolean optional,
-                             String path, Short workload, Boolean active) {
+                             String path, Short workload, Boolean active, String levelName,
+                             Curriculum curriculum, Subject subject) {
         this.subjectCurriculumId = subjectCurriculumId;
         this.level = level;
         this.optional = optional;
         this.path = path;
         this.workload = workload;
         this.active = active;
+        this.levelName = levelName;
+        this.curriculum = curriculum;
+        this.subject = subject;
     }
 
 }

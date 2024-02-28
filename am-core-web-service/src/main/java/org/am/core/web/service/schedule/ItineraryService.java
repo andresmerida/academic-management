@@ -1,12 +1,13 @@
 package org.am.core.web.service.schedule;
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.domain.entity.admingeneral.Career;
+import org.am.core.web.domain.entity.admingeneral.Curriculum;
 import org.am.core.web.domain.entity.schedule.Itinerary;
 import org.am.core.web.dto.schedule.ItineraryDto;
 import org.am.core.web.dto.schedule.ItineraryRequest;
 import org.am.core.web.repository.jdbc.schedule.ItineraryJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
+import org.am.core.web.repository.jpa.admingeneral.CurriculumRepository;
 import org.am.core.web.repository.jpa.schedule.ItineraryRepository;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
     private final ItineraryRepository itineraryRepository;
     private final ItineraryJdbcRepository itineraryJdbcRepository;
+    private final CurriculumRepository curriculumRepository;
 
     public ItineraryDto save(ItineraryRequest itineraryRequest){
         return toDto(itineraryRepository.save(toEntity(itineraryRequest)));
@@ -31,22 +33,30 @@ public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
         return itineraryRepository.findById(id).map(this::toDto);
     }
 
-    public ItineraryDto edit(ItineraryRequest itineraryDto, Integer itineraryId){
+    public ItineraryDto edit(ItineraryRequest itineraryRequest, Integer itineraryId){
         Itinerary itineraryFromDB = itineraryRepository.findById(itineraryId)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid id"));
-        itineraryFromDB.setName(itineraryDto.name());
+
+        itineraryFromDB.setName(itineraryRequest.name());
+
+        Curriculum curriculum=curriculumRepository.findById(itineraryRequest.curriculumId())
+                .orElseThrow(()->new IllegalArgumentException("Invalid id"));
+
+        itineraryFromDB.setCurriculum(curriculum);
 
         return toDto(itineraryRepository.save(itineraryFromDB));
     }
 
     @Override
     public ItineraryDto toDto(Itinerary itinerary) {
+
         return new ItineraryDto(
                 itinerary.getId(),
                 itinerary.getName(),
-                itinerary.getCareer().getId(),
-                itinerary.getCareer().getName(),
-                itinerary.getCareer().getInitials()
+                itinerary.getCurriculum().getCareer().getId(),
+                itinerary.getCurriculum().getCareer().getName(),
+                itinerary.getCurriculum().getId(),
+                itinerary.getCurriculum().getName()
         );
     }
 
@@ -56,14 +66,13 @@ public class ItineraryService implements CustomMap<ItineraryDto, Itinerary> {
     }
 
     public Itinerary toEntity(ItineraryRequest itineraryRequest) {
+        Curriculum curriculum=curriculumRepository.findById(itineraryRequest.curriculumId())
+                .orElseThrow(()->new IllegalArgumentException("Invalid id"));
+
         Itinerary itinerary = new Itinerary();
         itinerary.setName(itineraryRequest.name());
         itinerary.setActive(Boolean.TRUE);
-
-        Career career = new Career();
-        career.setId(itineraryRequest.careerId());
-
-        itinerary.setCareer(career);
+        itinerary.setCurriculum(curriculum);
         return itinerary;
     }
 

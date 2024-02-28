@@ -20,13 +20,6 @@ public class ScheduleItineraryController {
 
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ScheduleDto> getScheduleById(@PathVariable final Integer id){
-        return ResponseEntity
-                .ok()
-                .body(scheduleItineraryService.getItineraryById(id).orElseThrow(IllegalArgumentException::new));
-    }
-
     @PostMapping
     public ResponseEntity<ScheduleDto> create(@RequestBody final ScheduleRequest scheduleRequest, @PathVariable final Integer groupId) throws URISyntaxException {
         ScheduleDto scheduleDto = scheduleItineraryService.save(scheduleRequest);
@@ -39,6 +32,13 @@ public class ScheduleItineraryController {
         return ResponseEntity
                 .ok()
                 .body(scheduleItineraryService.edit(scheduleRequest, id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final Integer id){
+
+        scheduleItineraryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 

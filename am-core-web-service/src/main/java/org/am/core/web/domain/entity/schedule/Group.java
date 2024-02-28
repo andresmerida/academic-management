@@ -17,7 +17,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.am.core.web.domain.entity.admingeneral.AcademicPeriod;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -49,20 +50,22 @@ public class Group {
     @JoinColumn(name = "academic_period_id")
     private AcademicPeriod academicPeriod;
 
-    @OneToMany(mappedBy="group", cascade = CascadeType.MERGE)
-    private List<Schedule> schedules;
+    @OneToMany(mappedBy="group", cascade = CascadeType.ALL)
+    private Set<Schedule> scheduleSetList = new HashSet<>();
 
     public Group(String identifier,
                  String remark,
                  boolean active,
                  SubjectCurriculum subjectCurriculum,
                  Itinerary itinerary,
-                 AcademicPeriod academicPeriod) {
+                 AcademicPeriod academicPeriod,
+                 Set<Schedule> scheduleSetList) {
         this.identifier = identifier;
         this.remark = remark;
         this.active = active;
         this.subjectCurriculum = subjectCurriculum;
         this.itinerary = itinerary;
         this.academicPeriod =  academicPeriod;
+        this.scheduleSetList = scheduleSetList;
     }
 }

@@ -9,11 +9,10 @@ import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.ScheduleItineraryRepository;
 import org.springframework.stereotype.Service;
 
+
 import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.am.core.web.util.CommonUtils.getFullName;
 import static org.am.core.web.util.UtilConstants.NOT_ASSIGNED_YET;
@@ -25,16 +24,13 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
 
     private final ScheduleItineraryRepository scheduleItineraryRepository;
 
-    public Optional<ScheduleDto> getItineraryById(Integer id){
-        return scheduleItineraryRepository.findById(id).map(this::toDto);
-    }
 
     public ScheduleDto save(ScheduleRequest scheduleRequest){
         return toDto(scheduleItineraryRepository.save(toEntity(scheduleRequest)));
     }
 
 
-    public List<ScheduleDto> saveAll(List<ScheduleRequest> scheduleRequestList, GroupItinerary savedGroup) {
+    public void saveAll(List<ScheduleRequest> scheduleRequestList, GroupItinerary savedGroup) {
 
         List<ScheduleItinerary> scheduleItineraries = new ArrayList<>();
 
@@ -44,11 +40,7 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
             scheduleItineraries.add(schedule);
         }
 
-        return scheduleItineraryRepository.saveAll(scheduleItineraries).stream()
-                .map(this::toDto)
-                .collect(Collectors.toList());
-
-
+        scheduleItineraryRepository.saveAll(scheduleItineraries);
     }
 
     public ScheduleDto edit(ScheduleRequest scheduleDto, Integer scheduleItineraryId){
@@ -74,6 +66,12 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
         return toDto(scheduleItineraryRepository.save(scheduleItineraryFromDB));
     }
 
+    public void delete(Integer id) {
+        scheduleItineraryRepository.deleteById(id);
+    }
+    public void deleteAll( List<ScheduleItinerary> schedules) {
+        scheduleItineraryRepository.deleteAll(schedules);
+    }
     @Override
     public ScheduleDto toDto(ScheduleItinerary scheduleItinerary) {
         String fullName = NOT_ASSIGNED_YET;
@@ -133,4 +131,10 @@ public class ScheduleItineraryService implements CustomMap<ScheduleDto, Schedule
 
         return professor;
     }
+
+    public List<ScheduleItinerary> findSchedleByGroupId(Integer groupId){
+        return scheduleItineraryRepository.findByGroupItineraryId(groupId);
+    }
 }
+
+

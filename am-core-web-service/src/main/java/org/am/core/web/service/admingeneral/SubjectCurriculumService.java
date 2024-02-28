@@ -1,6 +1,6 @@
-package org.am.core.web.service.schedule;
+package org.am.core.web.service.admingeneral;
 
-
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.am.core.web.domain.entity.schedule.SubjectCurriculum;
 import org.am.core.web.domain.entity.schedule.SubjectCurriculumId;
@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SubjectCurriculumService implements CustomMap<SubjectCurriculumDto, SubjectCurriculum> {
 
     private final SubjectCurriculumRepository subjectCurriculumRepository;

@@ -61,4 +61,10 @@ public class GroupItineraryController {
                 .ok()
                 .body(groupItineraryService.edit(groupRequest, id));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable final Integer id){
+        groupItineraryService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }
