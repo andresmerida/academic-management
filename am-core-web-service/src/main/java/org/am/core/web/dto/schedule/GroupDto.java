@@ -7,6 +7,5 @@ public record GroupDto(Integer id,
                        String subjectName,
                        String subjectInitials,
                        String groupIdentifier,
-                       String remark,
                        List<ScheduleDto> listScheduleDto) {
 }

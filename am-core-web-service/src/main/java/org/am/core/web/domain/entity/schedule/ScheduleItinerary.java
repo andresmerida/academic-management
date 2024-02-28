@@ -44,6 +44,10 @@ public class ScheduleItinerary {
     @JoinColumn(name = "group_itinerary_id")
     private GroupItinerary groupItinerary;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "classMan")
+    private ClassMan classMan;
+
     public ScheduleItinerary(LocalTime startTime,
                              LocalTime endTime,
                              Integer dayOfWeek,
