@@ -1,5 +1,6 @@
 package org.am.core.web.domain.entity.schedule;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -36,25 +37,28 @@ public class Schedule {
     private LocalTime endTime;
 
     @Column(name = "weekday")
-    private String weekday;
+    private Integer weekday;
 
     private String assistant;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classroom_id")
     private Classroom classroom;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "professor_id")
     private Professor professor;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private Group group;
 
     public Schedule (LocalTime startTime,
                      LocalTime endTime,
-                     String weekday,
+                     Integer weekday,
                      String assistant,
                      Classroom classroom,
                      Professor professor,

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.am.core.web.domain.entity.schedule.Schedule;
 import org.am.core.web.dto.schedule.ScheduleDto;
 import org.am.core.web.repository.jpa.CustomMap;
+import org.am.core.web.repository.jpa.schedule.ScheduleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ScheduleService implements CustomMap<ScheduleDto, Schedule> {
 
+    private final ScheduleRepository scheduleRepository;
     @Override
     public ScheduleDto toDto(Schedule schedule) {
         return null;
@@ -20,5 +22,9 @@ public class ScheduleService implements CustomMap<ScheduleDto, Schedule> {
     @Override
     public Schedule toEntity(ScheduleDto scheduleDto) {
         return null;
+    }
+
+    public void delete(Schedule schedule){
+      scheduleRepository.delete(schedule);
     }
 }

@@ -1,5 +1,6 @@
 package org.am.core.web.domain.entity.schedule;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -17,7 +18,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.am.core.web.domain.entity.admingeneral.AcademicPeriod;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -34,6 +37,7 @@ public class Group {
     private String remark;
     private boolean active;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumns({
             @JoinColumn(name = "curriculum_id", referencedColumnName = "curriculum_id"),
@@ -41,28 +45,32 @@ public class Group {
     })
     private SubjectCurriculum subjectCurriculum;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "itinerary_id")
     private Itinerary itinerary;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "academic_period_id")
     private AcademicPeriod academicPeriod;
 
     @OneToMany(mappedBy="group", cascade = CascadeType.MERGE)
-    private List<Schedule> schedules;
+    private Set<Schedule> scheduleSetList = new HashSet<>();
 
     public Group(String identifier,
                  String remark,
                  boolean active,
                  SubjectCurriculum subjectCurriculum,
                  Itinerary itinerary,
-                 AcademicPeriod academicPeriod) {
+                 AcademicPeriod academicPeriod,
+                 Set<Schedule> scheduleSetList) {
         this.identifier = identifier;
         this.remark = remark;
         this.active = active;
         this.subjectCurriculum = subjectCurriculum;
         this.itinerary = itinerary;
         this.academicPeriod =  academicPeriod;
+        this.scheduleSetList = scheduleSetList;
     }
 }
