@@ -5,10 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.am.core.web.dto.schedule.GroupAuxDto;
 import org.am.core.web.dto.schedule.GroupDetailedAuxDto;
 import org.am.core.web.repository.jdbc.schedule.GroupItineraryJdbcRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -89,5 +91,28 @@ public class GroupItineraryJdbcRepositoryImpl implements GroupItineraryJdbcRepos
                 .param(itineraryId)
                 .query(GroupDetailedAuxDto.class)
                 .list();
+    }
+
+    @Override
+    public String suggestGroupItineraryIdentifier(Integer subjectId, Integer curriculumId) {
+        List<String> identifierGroupItineraryList =
+                jdbcClient.sql("""
+                     SELECT gi.identifier
+                     FROM group_itinerary gi
+                     WHERE gi.curriculum_id=? and gi.subject_id=? order by gi.identifier DESC""")
+                .param(curriculumId)
+                .param(subjectId)
+                .query(String.class)
+                .list();
+        if (identifierGroupItineraryList.isEmpty()) {
+            return "1";
+        }
+
+        Optional<Integer> maxIdentifierValue = identifierGroupItineraryList.stream()
+                .filter(StringUtils::isNumeric)
+                .map(value -> Integer.parseInt(value) + 1)
+                .findFirst();
+
+        return maxIdentifierValue.map(Object::toString).orElse("");
     }
 }

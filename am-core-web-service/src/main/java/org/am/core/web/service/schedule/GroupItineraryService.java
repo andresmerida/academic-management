@@ -14,6 +14,7 @@ import org.am.core.web.dto.schedule.ScheduleDto;
 import org.am.core.web.repository.jdbc.schedule.GroupItineraryJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.GroupItineraryRepository;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,6 +134,11 @@ public class GroupItineraryService implements CustomMap<GroupDto, GroupItinerary
         }
 
         return groupDtoList;
+    }
+
+    @Transactional(readOnly = true)
+    public String suggestGroupIdentifier(Integer subjectId, Integer curriculumId) {
+        return groupItineraryJdbcRepository.suggestGroupItineraryIdentifier(subjectId, curriculumId);
     }
 
     @Transactional(readOnly = true)
