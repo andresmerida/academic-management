@@ -1,11 +1,13 @@
 package org.am.core.web.domain.entity.users;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "professor")
@@ -23,8 +25,11 @@ public class Professor {
     private String lastName;
     @Column(name = "second_last_name")
     private String secondLastName;
+    @OneToMany(mappedBy = "professor", cascade = CascadeType.ALL)
+    private List<AreaProfessor> listAreaProfessor = new ArrayList<>();
 
-    public Professor(String name, String lastName, String secondLastName) {
+    public Professor(Integer id, String name, String lastName, String secondLastName) {
+        this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.secondLastName = secondLastName;
