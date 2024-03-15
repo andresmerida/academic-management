@@ -40,6 +40,7 @@ public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, Acade
         academicPeriod.setName(academicPeriodDto.name());
         academicPeriod.setStartDate(academicPeriodDto.startDate());
         academicPeriod.setEndDate(academicPeriodDto.endDate());
+        academicPeriod.setEnrollmentCost(academicPeriodDto.enrollmentCost());
 
         return toDto(academicPeriodRepository.save(academicPeriod));
 
@@ -68,7 +69,8 @@ public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, Acade
                 academicPeriod.getYear(),
                 academicPeriod.getName(),
                 academicPeriod.getStartDate(),
-                academicPeriod.getEndDate()
+                academicPeriod.getEndDate(),
+                academicPeriod.getEnrollmentCost()
         );
     }
 
@@ -83,6 +85,7 @@ public class AcademicPeriodService implements CustomMap<AcademicPeriodDto, Acade
         academicPeriod.setStartDate(academicPeriodRequest.startDate());
         academicPeriod.setEndDate(academicPeriodRequest.endDate());
         academicPeriod.setActive(Boolean.TRUE);
+        academicPeriod.setEnrollmentCost(academicPeriodRequest.enrollmentCost());
 
         Area area = new Area();
         area.setId(academicPeriodRequest.areaId());

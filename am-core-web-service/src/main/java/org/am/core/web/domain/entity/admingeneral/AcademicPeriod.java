@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -24,17 +25,22 @@ public class AcademicPeriod {
     @Column(name = "end_date")
     private LocalDate endDate;
     private Boolean active;
+    @Column(name = "enrollment_cost")
+    private BigDecimal enrollmentCost;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_id")
     private Area area;
 
-    public AcademicPeriod(Integer year, String name, LocalDate startDate, LocalDate endDate, Boolean active, Area area) {
+    public AcademicPeriod(Integer year, String name,
+                          LocalDate startDate, LocalDate endDate,
+                          Boolean active, BigDecimal enrollmentCost, Area area) {
         this.year = year;
         this.name = name;
         this.startDate = startDate;
         this.endDate = endDate;
         this.active = active;
+        this.enrollmentCost = enrollmentCost;
         this.area = area;
     }
 }
