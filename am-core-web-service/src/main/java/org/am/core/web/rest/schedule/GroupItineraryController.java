@@ -31,6 +31,11 @@ public class GroupItineraryController {
                 .ok()
                 .body(groupItineraryService.getItineraryById(id).orElseThrow(IllegalArgumentException::new));
     }
+    @GetMapping("/suggest-group-identifier")
+    public ResponseEntity<String> suggestGroupIdentifier(@RequestParam final Integer subjectId,
+                                                         @RequestParam final Integer curriculumId) {
+        return ResponseEntity.ok().body(groupItineraryService.suggestGroupIdentifier(subjectId, curriculumId));
+    }
 
     @PostMapping
     public ResponseEntity<GroupDto> create(@PathVariable final Integer areaId,

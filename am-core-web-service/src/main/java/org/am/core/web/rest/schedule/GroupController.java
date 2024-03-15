@@ -1,8 +1,6 @@
 package org.am.core.web.rest.schedule;
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.dto.admingeneral.CurriculumDetailedDto;
-import org.am.core.web.dto.admingeneral.CurriculumDto;
 import org.am.core.web.dto.schedule.GroupDto;
 import org.am.core.web.dto.schedule.GroupRequest;
 import org.am.core.web.service.schedule.GroupService;
@@ -12,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/admin/areas/{areaId}/careers/{careerId}/academic-periods/{academicPeriodId}/groups")
@@ -47,6 +44,13 @@ public class GroupController {
         return ResponseEntity
                 .ok()
                 .body(groupService.listGroupsByCareerAndAcademicPeriod(careerId, academicPeriodId));
+    }
+    @GetMapping("/suggest-group-identifier")
+    public ResponseEntity<String> suggestGroupIdentifier(@RequestParam final Integer subjectId,
+                                                         @RequestParam final Integer curriculumId) {
+        return ResponseEntity
+                .ok()
+                .body(groupService.suggestGroupIdentifier(subjectId, curriculumId));
     }
 
     @PutMapping("/{id}")
