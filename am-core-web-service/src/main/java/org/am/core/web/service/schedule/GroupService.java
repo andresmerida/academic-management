@@ -217,6 +217,11 @@ public class GroupService implements CustomMap <GroupDto, Group> {
         return toDto(groupRepository.save(groupFromDb));
     }
 
+    @Transactional(readOnly = true)
+    public String suggestGroupIdentifier(Integer subjectId, Integer curriculumId) {
+        return groupJdbcRepository.suggestGroupIdentifier(subjectId, curriculumId);
+    }
+
     public void delete(Integer id) {
         groupRepository.deleteById(id);
 

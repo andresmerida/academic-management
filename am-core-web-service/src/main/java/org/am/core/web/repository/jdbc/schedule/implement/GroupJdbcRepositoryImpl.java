@@ -3,10 +3,12 @@ package org.am.core.web.repository.jdbc.schedule.implement;
 import lombok.RequiredArgsConstructor;
 import org.am.core.web.dto.schedule.GroupAuxDto;
 import org.am.core.web.repository.jdbc.schedule.GroupJdbcRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -51,5 +53,28 @@ public class GroupJdbcRepositoryImpl implements GroupJdbcRepository {
                 .param(academicPiriodId)
                 .query(GroupAuxDto.class)
                 .list();
+    }
+    @Override
+    public String suggestGroupIdentifier(Integer subjectId, Integer curriculumId) {
+        List<String> identifierGroupList =
+                jdbcClient.sql("""
+                     SELECT cg.identifier
+                     FROM class_group cg
+                     WHERE cg.curriculum_id=? and cg.subject_id=? order by cg.identifier DESC
+                     """)
+                    .param(curriculumId)
+                    .param(subjectId)
+                    .query(String.class)
+                    .list();
+        if (identifierGroupList.isEmpty()) {
+            return "1";
+        }
+
+        Optional<Integer> maxIdentifierValue = identifierGroupList.stream()
+                .filter(StringUtils::isNumeric)
+                .map(value -> Integer.parseInt(value) + 1)
+                .findFirst();
+
+        return maxIdentifierValue.map(Object::toString).orElse("");
     }
 }
