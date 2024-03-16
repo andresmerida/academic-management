@@ -23,10 +23,12 @@ public class Professor {
     private String lastName;
     @Column(name = "second_last_name")
     private String secondLastName;
+    private Boolean active;
 
-    public Professor(String name, String lastName, String secondLastName) {
+    public Professor(String name, String lastName, String secondLastName, Boolean active) {
         this.name = name;
         this.lastName = lastName;
         this.secondLastName = secondLastName;
+        this.active = active;
     }
 }

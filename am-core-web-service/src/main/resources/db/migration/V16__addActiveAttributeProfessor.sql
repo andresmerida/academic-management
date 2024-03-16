@@ -1,0 +1,2 @@
+ALTER TABLE professor
+    ADD COLUMN active BOOLEAN NOT NULL;
