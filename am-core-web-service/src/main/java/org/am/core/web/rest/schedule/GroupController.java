@@ -40,7 +40,7 @@ public class GroupController {
 
     @GetMapping
     public ResponseEntity<List<GroupDto>> listGroupsByCareerAndAcademicPeriod(@PathVariable final Integer careerId,
-                                                                                  @PathVariable final Integer academicPeriodId){
+                                                                              @PathVariable final Integer academicPeriodId){
         return ResponseEntity
                 .ok()
                 .body(groupService.listGroupsByCareerAndAcademicPeriod(careerId, academicPeriodId));
@@ -56,7 +56,7 @@ public class GroupController {
     @PutMapping("/{id}")
     public ResponseEntity<GroupDto> edit(@RequestBody final GroupRequest dto,
                                          @PathVariable final Integer academicPeriodId,
-                                              @PathVariable final Integer id) {
+                                         @PathVariable final Integer id) {
 
         return ResponseEntity
                 .ok()

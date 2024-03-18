@@ -8,6 +8,7 @@ import org.am.core.web.dto.schedule.*;
 import org.am.core.web.repository.jdbc.schedule.GroupJdbcRepository;
 import org.am.core.web.repository.jpa.CustomMap;
 import org.am.core.web.repository.jpa.schedule.GroupRepository;
+import org.am.core.web.repository.jpa.schedule.SubjectCurriculumRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,8 @@ public class GroupService implements CustomMap <GroupDto, Group> {
     private final GroupRepository groupRepository;
     private final GroupJdbcRepository groupJdbcRepository;
     private final ScheduleService scheduleService;
-    private GroupItineraryService groupItineraryService;
+    private  GroupItineraryService groupItineraryService;
+    private final SubjectCurriculumRepository subjectCurriculumRepository;
 
     public List<GroupDto> listGroupsByCareerAndAcademicPeriod(Integer careerId, Integer academicPeriodId) {
         List<GroupDto> groupDtoList = new ArrayList<>();
@@ -92,130 +94,82 @@ public class GroupService implements CustomMap <GroupDto, Group> {
     }
 
     public GroupDto edit(GroupRequest dto, Integer id, Integer academicPeriodId) {
-        int requestIndex = 0;
-
         Group groupFromDb = groupRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid id for curriculumId"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid id for group"));
+
         groupFromDb.setIdentifier(dto.identifier());
         groupFromDb.setRemark(dto.remark());
 
         SubjectCurriculum subjectCurriculum = new SubjectCurriculum();
-        SubjectCurriculumId subjectCurriculumId = new SubjectCurriculumId(
-                dto.curriculumId(),
-                dto.subjectId());
+        SubjectCurriculumId subjectCurriculumId = new SubjectCurriculumId(dto.curriculumId(), dto.subjectId());
         subjectCurriculum.setSubjectCurriculumId(subjectCurriculumId);
         groupFromDb.setSubjectCurriculum(subjectCurriculum);
-        groupFromDb.setItinerary(null);
+
+        Itinerary itinerary = new Itinerary();
+        itinerary.setId(dto.itineraryId());
+        groupFromDb.setItinerary(itinerary);
 
         AcademicPeriod academicPeriod = new AcademicPeriod();
         academicPeriod.setId(academicPeriodId);
         groupFromDb.setAcademicPeriod(academicPeriod);
 
-        Set<Schedule> newScheduleSet = new HashSet<>();
-        Set<Schedule> scheduleSet = groupFromDb.getScheduleSetList();
+        Set<Schedule> schedulesCopyBaseDatos = new HashSet<>(groupFromDb.getScheduleSetList());
+        Set<Schedule> schedulesInDto = new HashSet<>();
+        Set<Schedule> schedulesNewInDto = new HashSet<>();
 
-        if (scheduleSet.size() == dto.listSchedule().size()){
-            for (Schedule scheduleAux : scheduleSet) {
-                if (requestIndex < dto.listSchedule().size()) {
-                    ScheduleRequest auxRequest = dto.listSchedule().get(requestIndex);
-
-                    scheduleAux.setStartTime(auxRequest.startTime());
-                    scheduleAux.setEndTime(auxRequest.endTime());
-                    scheduleAux.setWeekday(auxRequest.dayOfWeek().getValue());
-                    scheduleAux.setAssistant(auxRequest.assistant());
-
-                    Classroom classroom = new Classroom();
-                    classroom.setId(auxRequest.classroomId());
-                    scheduleAux.setClassroom(classroom);
-
-                    scheduleAux.setProfessor(buildProfessorById(auxRequest.professorId()));
-                    scheduleAux.setGroup(groupFromDb);
-
-                    newScheduleSet.add(scheduleAux);
-                    requestIndex++;
-                } else {
+        for (ScheduleRequest scheduleRequest : dto.listSchedule()) {
+            boolean foundMatch = false;
+            Iterator<Schedule> iterator = schedulesCopyBaseDatos.iterator();
+            while (iterator.hasNext()) {
+                Schedule schedule = iterator.next();
+                if (scheduleMatchesRequest(schedule, scheduleRequest)) {
+                    schedulesInDto.add(schedule);
+                    iterator.remove();
+                    foundMatch = true;
                     break;
                 }
             }
-        } else {
-            if (scheduleSet.size() < dto.listSchedule().size()){
-                for (Schedule scheduleAux : scheduleSet) {
-                    if (requestIndex < dto.listSchedule().size()) {
-                        ScheduleRequest auxRequest = dto.listSchedule().get(requestIndex);
-
-                        scheduleAux.setStartTime(auxRequest.startTime());
-                        scheduleAux.setEndTime(auxRequest.endTime());
-                        scheduleAux.setWeekday(auxRequest.dayOfWeek().getValue());
-                        scheduleAux.setAssistant(auxRequest.assistant());
-
-                        Classroom classroom = new Classroom();
-                        classroom.setId(auxRequest.classroomId());
-                        scheduleAux.setClassroom(classroom);
-
-                        scheduleAux.setProfessor(buildProfessorById(auxRequest.professorId()));
-                        scheduleAux.setGroup(groupFromDb);
-
-                        newScheduleSet.add(scheduleAux);
-                        requestIndex++;
-                    }
-                }
-                List<ScheduleRequest> remainingRequests = dto.listSchedule().subList(requestIndex,
-                        dto.listSchedule().size());
-                for (ScheduleRequest scheduleDetailedDtoList : remainingRequests) {
-                    Schedule schedule = new Schedule();
-                    schedule.setStartTime(scheduleDetailedDtoList.startTime());
-                    schedule.setEndTime(scheduleDetailedDtoList.endTime());
-                    schedule.setWeekday(scheduleDetailedDtoList.dayOfWeek().getValue());
-                    schedule.setAssistant(scheduleDetailedDtoList.assistant());
-
-                    Classroom classroom = new Classroom();
-                    classroom.setId(scheduleDetailedDtoList.classroomId());
-                    schedule.setClassroom(classroom);
-
-                    schedule.setProfessor(buildProfessorById(scheduleDetailedDtoList.professorId()));
-                    schedule.setGroup(groupFromDb);
-
-                    newScheduleSet.add(schedule);
-                }
-            }else {
-                if(scheduleSet.size() > dto.listSchedule().size()) {
-                    for (Schedule scheduleAux : scheduleSet) {
-                        if (requestIndex < dto.listSchedule().size()) {
-                            ScheduleRequest auxRequest = dto.listSchedule().get(requestIndex);
-
-                            scheduleAux.setStartTime(auxRequest.startTime());
-                            scheduleAux.setEndTime(auxRequest.endTime());
-                            scheduleAux.setWeekday(auxRequest.dayOfWeek().getValue());
-                            scheduleAux.setAssistant(auxRequest.assistant());
-
-                            Classroom classroom = new Classroom();
-                            classroom.setId(auxRequest.classroomId());
-                            scheduleAux.setClassroom(classroom);
-
-                            scheduleAux.setProfessor(buildProfessorById(auxRequest.professorId()));
-                            scheduleAux.setGroup(groupFromDb);
-
-                            newScheduleSet.add(scheduleAux);
-                            requestIndex++;
-                        }
-                    }
-                    Iterator<Schedule> iterator = scheduleSet.iterator();
-                    int count = 0;
-                    while (iterator.hasNext()) {
-                        Schedule schedule = iterator.next();
-                        if (count >= requestIndex) {
-                            scheduleService.delete(schedule.getId());
-                            iterator.remove();
-                        }
-                        count++;
-                    }
-                }
+            if (!foundMatch) {
+                Schedule newSchedule = createNewSchedule(scheduleRequest);
+                newSchedule.setGroup(groupFromDb);
+                schedulesNewInDto.add(newSchedule);
             }
         }
-        groupFromDb.setScheduleSetList(newScheduleSet);
 
+        for (Schedule scheduleToRemove : schedulesCopyBaseDatos) {
+            scheduleService.delete(scheduleToRemove.getId());
+        }
+
+        schedulesInDto.addAll(schedulesNewInDto);
+
+        groupFromDb.setScheduleSetList(schedulesInDto);
         return toDto(groupRepository.save(groupFromDb));
     }
+
+    private Schedule createNewSchedule(ScheduleRequest auxRequest ){
+        Schedule scheduleAux= new Schedule();
+        scheduleAux.setStartTime(auxRequest.startTime());
+        scheduleAux.setEndTime(auxRequest.endTime());
+        scheduleAux.setWeekday(auxRequest.dayOfWeek().getValue());
+        scheduleAux.setAssistant(auxRequest.assistant());
+
+        Classroom classroom = new Classroom();
+        classroom.setId(auxRequest.classroomId());
+        scheduleAux.setClassroom(classroom);
+
+        scheduleAux.setProfessor(buildProfessorById(auxRequest.professorId()));
+        return scheduleAux;
+    }
+    private boolean scheduleMatchesRequest(Schedule schedule, ScheduleRequest scheduleRequest) {
+        return schedule.getStartTime().equals(scheduleRequest.startTime()) &&
+                schedule.getEndTime().equals(scheduleRequest.endTime()) &&
+                schedule.getWeekday() == scheduleRequest.dayOfWeek().getValue() &&
+                Objects.equals(schedule.getAssistant(), scheduleRequest.assistant()) &&
+                Objects.equals(schedule.getClassroom().getId(), scheduleRequest.classroomId()) &&
+                Objects.equals(schedule.getProfessor() != null ? schedule.getProfessor().getId() : null, scheduleRequest.professorId());
+    }
+
+
 
     @Transactional(readOnly = true)
     public String suggestGroupIdentifier(Integer subjectId, Integer curriculumId) {
@@ -249,12 +203,13 @@ public class GroupService implements CustomMap <GroupDto, Group> {
                 curriculum.getId(),
                 subject.getId());
         subjectCurriculum.setSubjectCurriculumId(subjectCurriculumId);
+        Optional<SubjectCurriculum> dBsubjectCurriculum = subjectCurriculumRepository.findById(subjectCurriculumId);
 
         return new GroupDto(
                 group.getId(),
-                subjectCurriculum.getLevel(),
-                subject.getName(),
-                subject.getInitials(),
+                dBsubjectCurriculum.get().getLevel(),
+                dBsubjectCurriculum.get().getSubject().getName(),
+                dBsubjectCurriculum.get().getSubject().getInitials(),
                 group.getIdentifier(),
                 group.getRemark(),
                 scheduleDtos
