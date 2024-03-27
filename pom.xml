@@ -15,7 +15,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>am-core-web-service</module>
-        <module>am-util</module>
     </modules>
 
     <version>${revision}</version>
