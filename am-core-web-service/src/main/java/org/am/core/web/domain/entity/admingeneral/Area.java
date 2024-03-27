@@ -5,6 +5,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.am.core.web.domain.entity.users.Professor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "area")
@@ -20,6 +24,8 @@ public class Area {
     private String initials;
     private Boolean active;
     private String description;
+    @ManyToMany(mappedBy = "areas")
+    private Set<Professor> professors = new HashSet<>();
 
     public Area(String name, String initials, Boolean active, String description) {
         this.name = name;
