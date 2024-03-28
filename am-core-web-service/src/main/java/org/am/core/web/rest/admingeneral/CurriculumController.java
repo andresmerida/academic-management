@@ -1,7 +1,7 @@
 package org.am.core.web.rest.admingeneral;
 
 import lombok.RequiredArgsConstructor;
-import org.am.core.web.dto.admingeneral.CurriculumDetailedDto;
+import org.am.core.web.dto.admingeneral.CurriculumDetailedRequest;
 import org.am.core.web.dto.admingeneral.CurriculumDto;
 import org.am.core.web.dto.admingeneral.CurriculumRequest;
 import org.am.core.web.service.admingeneral.CurriculumService;
@@ -25,6 +25,17 @@ public class CurriculumController {
         return ResponseEntity.ok().body(curriculumService.getCurriculumsByCareerId(careerId));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCurriculumById(@PathVariable final Integer id,
+                                                                 @RequestParam(required = false) final Boolean detailed) {
+        return ResponseEntity.ok().body(
+                detailed ?
+                        curriculumService.getDetailedById(id).orElseThrow(() -> new IllegalArgumentException("Curriculum with "+ id+" not exist"))
+                        :
+                        curriculumService.getById(id).orElseThrow(() -> new IllegalArgumentException("Curriculum with "+ id+" not exist"))
+        );
+    }
+
     @PostMapping
     public ResponseEntity<CurriculumDto> create(@RequestBody final CurriculumRequest curriculumRequest,
                                             @PathVariable final Integer areaId) throws URISyntaxException {
@@ -33,7 +44,7 @@ public class CurriculumController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CurriculumDto> edit(@RequestBody final CurriculumDetailedDto dto,
+    public ResponseEntity<CurriculumDto> edit(@RequestBody final CurriculumDetailedRequest dto,
                                                       @PathVariable final Integer id) {
         if (dto.curriculumId() == null) {
             throw new IllegalArgumentException("Invalid career ID");
@@ -59,5 +70,4 @@ public class CurriculumController {
 
         return ResponseEntity.noContent().build();
     }
-
 }

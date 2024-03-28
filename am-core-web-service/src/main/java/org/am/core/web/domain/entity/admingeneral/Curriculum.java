@@ -7,8 +7,8 @@ import lombok.Setter;
 import org.am.core.web.domain.entity.schedule.SubjectCurriculum;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -40,7 +40,7 @@ public class Curriculum {
     private Career career;
 
     @OneToMany(mappedBy="curriculum", cascade = CascadeType.ALL)
-    private Set<SubjectCurriculum> subjectCurriculumSet = new HashSet<>();
+    private List<SubjectCurriculum> subjectCurriculumList = new ArrayList<>();
 
     public Curriculum(String name,
                       Short minApprovedSubjeccts,
@@ -48,13 +48,13 @@ public class Curriculum {
                       LocalDate endDate,
                       Boolean active,
                       Career career,
-                      Set<SubjectCurriculum> levelRequests) {
+                      List<SubjectCurriculum> levelRequests) {
         this.name = name;
         this.minApprovedSubjeccts = minApprovedSubjeccts;
         this.starDate = starDate;
         this.endDate = endDate;
         this.active = active;
         this.career = career;
-        this.subjectCurriculumSet = levelRequests;
+        this.subjectCurriculumList = levelRequests;
     }
 }
